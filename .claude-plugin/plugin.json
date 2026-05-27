@@ -1,10 +1,10 @@
 {
   "name": "www-cowork",
-  "version": "1.0.0",
-  "description": "Work-collaboration harness for Claude Code. Starts with AI session recap + per-commit verbatim directive logs; integrates with www-wiki / taise when present, runs standalone otherwise.",
+  "version": "1.1.0",
+  "description": "Work-collaboration harness for Claude Code. /www-insights for AI session reports + /www-commit for per-commit verbatim directive logs; integrates with www-wiki / taise when present, runs standalone otherwise.",
   "author": {
     "name": "ww-w-ai"
   },
   "license": "MIT",
-  "keywords": ["recap", "cowork", "ai-collaboration", "session-report", "commit-history", "directive-log"]
+  "keywords": ["www-insights", "www-commit", "cowork", "ai-collaboration", "session-report", "commit-history", "directive-log"]
 }

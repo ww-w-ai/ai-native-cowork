@@ -464,6 +464,7 @@ async function main() {
       break
     }
 
+    case 'www-commit':
     case 'recap-commit': {
       let repoPath = process.cwd()
       for (let i = 1; i < args.length; i++) {
@@ -605,7 +606,7 @@ async function main() {
     }
 
     default:
-      console.error('Usage: bun run src/cli.ts [scan|summarize|recap-commit|commit-log|prepare-facets|render-report] [--from DATE] [--to DATE] ...')
+      console.error('Usage: bun run src/cli.ts [scan|summarize|www-commit|commit-log|prepare-facets|render-report] [--from DATE] [--to DATE] ...')
       process.exit(1)
   }
 }

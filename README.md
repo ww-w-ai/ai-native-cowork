@@ -13,9 +13,9 @@ standup busywork. It runs entirely on data you already have.
 
 | Capability | What you get | Status |
 |------------|--------------|:------:|
-| **`/recap`** | Narrative HTML + Markdown report of any time range — key prompts verbatim, per-session assessment, tool/token/cost charts. Paste into Jira, Notion, Slack. Weekly/monthly reviews. | ✅ shipped |
-| **`/recap-commit`** | Two artifacts in one commit: ① `<details>` recap block in the commit message (key prompts + assessment) ② verbatim directive-log file under `docs/commit-log/` with mini-recap stats + full instruction transcript. Backfill mode documents past commits. | ✅ shipped |
-| **www-wiki / taise integration** | When the [www-wiki] vault or [taise] harness is installed, recap output and directive logs file themselves into your knowledge base. Standalone otherwise. | 🛠 planned |
+| **`/www-insights`** | Narrative HTML + Markdown report of any time range — key prompts verbatim, per-session assessment, tool/token/cost charts. Paste into Jira, Notion, Slack. Weekly/monthly reviews. | ✅ shipped |
+| **`/www-commit`** | Two artifacts in one commit: ① `<details>` recap block in the commit message (key prompts + assessment) ② verbatim directive-log file under `docs/commit-log/` with mini-recap stats + full instruction transcript. Backfill mode documents past commits. | ✅ shipped |
+| **www-wiki / taise integration** | When the [www-wiki] vault or [taise] harness is installed, www-insights output and directive logs file themselves into your knowledge base. Standalone otherwise. | 🛠 planned |
 
 ## Why it's different
 
@@ -65,13 +65,13 @@ git clone https://github.com/ww-w-ai/www-cowork.git
 ## Usage
 
 ```
-/recap                                    # All time, current project
-/recap --from 1w                          # Last 7 days (exact 168h)
-/recap --from 2026-04-01 --to 2026-04-07  # Date range
-/recap --from 1m --scope all              # Last month, every project
-/recap 최근 1주일, 전체 프로젝트, 한국어로   # Natural language, any language
-/recap-commit                             # Recap + directive log in your next commit
-/recap-commit backfill                    # Document past commits retroactively
+/www-insights                                    # All time, current project
+/www-insights --from 1w                          # Last 7 days (exact 168h)
+/www-insights --from 2026-04-01 --to 2026-04-07  # Date range
+/www-insights --from 1m --scope all              # Last month, every project
+/www-insights 최근 1주일, 전체 프로젝트, 한국어로   # Natural language, any language
+/www-commit                             # Recap + directive log in your next commit
+/www-commit backfill                    # Document past commits retroactively
 ```
 
 Three report formats — **full** (deep weekly/monthly review), **standard** (mid-week
@@ -96,7 +96,7 @@ Relative (`1d`, `7d`/`1w`, `2w`, `1m`) = exact duration from now. Absolute
 ## How it works
 
 ```
-/recap --from 1w --scope all
+/www-insights --from 1w --scope all
         │
         ▼
   [1] Engine scans ~/.claude/projects/ for session JSONL (streaming, on disk)
@@ -118,13 +118,13 @@ www-cowork/
 ├── .claude-plugin/plugin.json   # Plugin manifest
 ├── manifest.json
 ├── skills/
-│   ├── recap/SKILL.md           # /recap — narrative report pipeline
-│   └── recap-commit/
-│       ├── SKILL.md             # /recap-commit — recap + directive log + backfill
+│   ├── www-insights/SKILL.md     # /www-insights — narrative report pipeline
+│   └── www-commit/
+│       ├── SKILL.md             # /www-commit — recap + directive log + backfill
 │       └── references/
 │           └── commit-log-format.md  # Verbatim transcription template
 ├── src/                         # Bun + TypeScript engine
-│   ├── cli.ts                   # CLI entry (scan, summarize, recap-commit, commit-log, prepare-facets, render-report)
+│   ├── cli.ts                   # CLI entry (scan, summarize, www-commit, commit-log, prepare-facets, render-report)
 │   ├── commit-log.ts            # Directive extraction: buildTurns, synthetic filters, reactive pairing
 │   ├── commit-log.test.ts       # 16 unit tests (bun:test)
 │   ├── session-scanner.ts       # Streaming JSONL parser, path matching, date filtering
@@ -132,7 +132,7 @@ www-cowork/
 │   ├── metrics-extractor.ts     # Token / tool / cost / concurrency extraction
 │   ├── facet-cache.ts           # Facet + meta cache (stale detection)
 │   ├── html-report.ts           # Template engine (JSON → HTML/MD)
-│   ├── generate-narrative.ts    # /recap single-entry pipeline
+│   ├── generate-narrative.ts    # /www-insights single-entry pipeline
 │   └── git-analyzer.ts          # Git log analysis
 ├── docs/specs/                  # Design specs
 └── evals/                       # Skill trigger + A/B evaluation configs
@@ -140,7 +140,7 @@ www-cowork/
 
 ## For teams
 
-When everyone runs `/recap --from 1w` and shares the Markdown:
+When everyone runs `/www-insights --from 1w` and shares the Markdown:
 
 - **Standup replacement** — what you did, what blocked you, what's next
 - **Sprint retro data** — friction patterns across the team reveal systemic issues

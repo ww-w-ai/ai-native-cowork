@@ -1,6 +1,6 @@
 ---
-name: recap-commit
-description: Trigger whenever the user asks to commit AND wants the commit message enriched with AI collaboration history. Records key prompts verbatim, structured assessment (goal/outcome/friction), and summarizes the AI collaboration journey since the last commit as a collapsible <details> block on GitHub/GitLab PRs. The key signal is the combination of (1) making a commit with (2) capturing how AI contributed. Trigger on phrases like commit with AI recap, attach collaboration history to commit, record AI work in commit, recap-commit. DO NOT trigger for plain commits without AI documentation, standalone time-period recaps (use recap instead), PR reviews, or general git operations.
+name: www-commit
+description: Trigger whenever the user asks to commit AND wants the commit message enriched with AI collaboration history. Records key prompts verbatim, structured assessment (goal/outcome/friction), and summarizes the AI collaboration journey since the last commit as a collapsible <details> block on GitHub/GitLab PRs. The key signal is the combination of (1) making a commit with (2) capturing how AI contributed. Trigger on phrases like commit with AI recap, attach collaboration history to commit, record AI work in commit, www-commit. DO NOT trigger for plain commits without AI documentation, standalone time-period recaps (use www-insights instead), PR reviews, or general git operations.
 allowedTools:
   - Bash
   - Read
@@ -16,7 +16,7 @@ You are creating a git commit that includes an **AI collaboration recap** — a 
 
 ```bash
 ENGINE=/Users/taehyoungkim/Documents/DEV/ww-w-ai/www-cowork/src/cli.ts
-bun run "$ENGINE" recap-commit --path "$PWD"
+bun run "$ENGINE" www-commit --path "$PWD"
 ```
 
 This scans sessions since the last git commit **in the current project** and outputs JSON
@@ -108,7 +108,7 @@ bun run "$ENGINE" commit-log --path "$PWD"
 This outputs `{ window, turns }`. Each turn has `ts`, `sessionId`, `line`, `userText`,
 `isReactive`, optional `precedingAssistant` / `options` / `decision`.
 
-1. If `turns` is empty, skip the file (still create the commit with the message recap).
+1. If `turns` is empty, skip the file (still create the commit with the message block).
 2. **`slug`** — a SHORT ENGLISH descriptor coined from the commit subject's meaning,
    lowercase, words joined by `-`, ≤ 50 chars. Do NOT mechanically slugify a Korean subject.
 3. **timestamp** — "now" in KST as `YYYYMMDD-HHMMSS`:
