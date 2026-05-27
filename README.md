@@ -13,10 +13,9 @@ standup busywork. It runs entirely on data you already have.
 
 | Capability | What you get | Status |
 |------------|--------------|:------:|
-| **`/recap`** | Narrative HTML + Markdown report of any time range — key prompts verbatim, per-session assessment, tool/token/cost charts. Paste into Jira, Notion, Slack. | ✅ shipped |
-| **`/recap-commit`** | A collapsible `<details>` block in your commit message: the key prompts that drove the change, structured assessment, stats. Reviewers see how AI contributed. | ✅ shipped |
-| **Directive logs** | Per-commit **verbatim transcription** files under `docs/commit-log/` — the exact instructions that led to each commit, re-typable to reproduce the work. | 🛠 in progress |
-| **www-wiki / taise integration** | When the [www-wiki] vault or [taise] harness is installed, recap output and directive logs file themselves into your knowledge base. Standalone otherwise. | 🛠 in progress |
+| **`/recap`** | Narrative HTML + Markdown report of any time range — key prompts verbatim, per-session assessment, tool/token/cost charts. Paste into Jira, Notion, Slack. Weekly/monthly reviews. | ✅ shipped |
+| **`/recap-commit`** | Two artifacts in one commit: ① `<details>` recap block in the commit message (key prompts + assessment) ② verbatim directive-log file under `docs/commit-log/` with mini-recap stats + full instruction transcript. Backfill mode documents past commits. | ✅ shipped |
+| **www-wiki / taise integration** | When the [www-wiki] vault or [taise] harness is installed, recap output and directive logs file themselves into your knowledge base. Standalone otherwise. | 🛠 planned |
 
 ## Why it's different
 
@@ -33,15 +32,32 @@ collaboration history).
 
 ## Install
 
+**Via ww-w-ai marketplace (recommended):**
+
+Add the ww-w-ai marketplace to your Claude Code settings, then enable the plugin:
+
+```jsonc
+// ~/.claude/settings.json
+{
+  "extraKnownMarketplaces": {
+    "ww-w-ai": {
+      "source": { "source": "github", "repo": "ww-w-ai/marketplace" }
+    }
+  },
+  "enabledPlugins": {
+    "www-cowork@ww-w-ai": true
+  }
+}
+```
+
+Restart Claude Code — the plugin downloads automatically.
+
+**Manual install:**
+
 ```bash
-# Clone into your dev workspace
-git clone <repo> ~/Documents/DEV/ww-w-ai/www-cowork
-
-# Symlink the skills into Claude Code
-ln -s ~/Documents/DEV/ww-w-ai/www-cowork/skills/recap        ~/.claude/skills/recap
-ln -s ~/Documents/DEV/ww-w-ai/www-cowork/skills/recap-commit ~/.claude/skills/recap-commit
-
-# Restart Claude Code
+git clone https://github.com/ww-w-ai/www-cowork.git
+# Add to settings.json:
+# "www-cowork@local:/path/to/www-cowork": true
 ```
 
 **Requirements:** [Claude Code](https://claude.ai/claude-code) v2.1.71+ · [Bun](https://bun.sh) (TypeScript engine).
@@ -54,7 +70,8 @@ ln -s ~/Documents/DEV/ww-w-ai/www-cowork/skills/recap-commit ~/.claude/skills/re
 /recap --from 2026-04-01 --to 2026-04-07  # Date range
 /recap --from 1m --scope all              # Last month, every project
 /recap 최근 1주일, 전체 프로젝트, 한국어로   # Natural language, any language
-/recap-commit                             # Attach AI recap to your next commit
+/recap-commit                             # Recap + directive log in your next commit
+/recap-commit backfill                    # Document past commits retroactively
 ```
 
 Three report formats — **full** (deep weekly/monthly review), **standard** (mid-week
@@ -102,9 +119,14 @@ www-cowork/
 ├── manifest.json
 ├── skills/
 │   ├── recap/SKILL.md           # /recap — narrative report pipeline
-│   └── recap-commit/SKILL.md    # /recap-commit — commit-attached recap
+│   └── recap-commit/
+│       ├── SKILL.md             # /recap-commit — recap + directive log + backfill
+│       └── references/
+│           └── commit-log-format.md  # Verbatim transcription template
 ├── src/                         # Bun + TypeScript engine
-│   ├── cli.ts                   # CLI entry (scan, summarize, recap-commit, render-report, prepare-facets)
+│   ├── cli.ts                   # CLI entry (scan, summarize, recap-commit, commit-log, prepare-facets, render-report)
+│   ├── commit-log.ts            # Directive extraction: buildTurns, synthetic filters, reactive pairing
+│   ├── commit-log.test.ts       # 16 unit tests (bun:test)
 │   ├── session-scanner.ts       # Streaming JSONL parser, path matching, date filtering
 │   ├── recap-engine.ts          # Pipeline orchestrator
 │   ├── metrics-extractor.ts     # Token / tool / cost / concurrency extraction
@@ -112,7 +134,7 @@ www-cowork/
 │   ├── html-report.ts           # Template engine (JSON → HTML/MD)
 │   ├── generate-narrative.ts    # /recap single-entry pipeline
 │   └── git-analyzer.ts          # Git log analysis
-├── docs/specs/                  # Design specs (e.g. commit directive logs)
+├── docs/specs/                  # Design specs
 └── evals/                       # Skill trigger + A/B evaluation configs
 ```
 
