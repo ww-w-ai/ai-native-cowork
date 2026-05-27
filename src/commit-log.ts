@@ -60,7 +60,7 @@ export function parseDecision(userText: string): string | undefined {
 }
 
 const SYNTHETIC_RE =
-  /^(<command-(name|message|args)>|<local-command-(stdout|stderr)>|<bash-(input|stdout|stderr)>|<user-prompt-submit-hook>|Caveat: The messages below were generated)/
+  /^(<command-(name|message|args)>|<local-command-(stdout|stderr|caveat)>|<bash-(input|stdout|stderr)>|<user-prompt-submit-hook>|Caveat: The messages below were generated|Base directory for this skill:)/
 
 export function isSynthetic(text: string): boolean {
   return SYNTHETIC_RE.test(text.trim())
@@ -70,6 +70,7 @@ export function stripSystemTags(text: string): string {
   return text
     .replace(/<system-reminder>[\s\S]*?<\/system-reminder>/g, '')
     .replace(/<user-prompt-submit-hook>[\s\S]*?<\/user-prompt-submit-hook>/g, '')
+    .replace(/<local-command-caveat>[\s\S]*?<\/local-command-caveat>/g, '')
     .trim()
 }
 
