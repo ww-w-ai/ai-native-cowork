@@ -1,0 +1,9 @@
+{
+  "name": "www-cowork",
+  "version": "1.0.0",
+  "description": "Work-collaboration harness for Claude Code. Starts with AI session recap + per-commit verbatim directive logs; integrates with www-wiki / taise when present, runs standalone otherwise.",
+  "author": "ww-w-ai",
+  "skills": ["skills/"],
+  "agents": [],
+  "scripts": ["src/"]
+}
