@@ -17,6 +17,7 @@ import { runRecapPipeline, runCommitRecapPipeline } from './recap-engine.js'
 import { estimateCost } from './metrics-extractor.js'
 import { analyzeGitHistory } from './git-analyzer.js'
 import { parseDateArg, getSystemTimezone, getClaudeHome, scanSessionFiles, formatTranscript, type ScanScope } from './session-scanner.js'
+import { readRawMessages, buildTurns } from './commit-log.js'
 import { generateFullReport, generateMarkdownReport, NARRATIVE_SCHEMA_DESCRIPTION, type NarrativeData, type ScanData } from './html-report.js'
 import { loadCachedFacets, type SessionFacet } from './facet-cache.js'
 import { execFileSync, execSync } from 'child_process'
@@ -464,18 +465,21 @@ async function main() {
     }
 
     case 'recap-commit': {
+      let repoPath = process.cwd()
+      for (let i = 1; i < args.length; i++) {
+        if (args[i] === '--path' && args[i + 1]) { repoPath = args[i + 1]!; i++ }
+      }
       let lastCommitISO: string
       try {
         lastCommitISO = execFileSync('git', ['log', '-1', '--format=%cI'], {
-          encoding: 'utf-8',
-          timeout: 10000,
+          encoding: 'utf-8', timeout: 10000, cwd: repoPath,
         }).trim()
       } catch {
         console.error(JSON.stringify({ error: 'no_previous_commit' }))
         process.exit(1)
       }
 
-      const data = await runCommitRecapPipeline(lastCommitISO)
+      const data = await runCommitRecapPipeline(lastCommitISO, repoPath)
       console.log(JSON.stringify({
         lastCommit: lastCommitISO,
         ...formatSessionData(data, getSystemTimezone()),
@@ -555,8 +559,53 @@ async function main() {
       break
     }
 
+    case 'commit-log': {
+      let fromISO: string | undefined
+      let toISO: string | undefined
+      let repoPath = process.cwd()
+      for (let i = 1; i < args.length; i++) {
+        if (args[i] === '--from' && args[i + 1]) { fromISO = args[i + 1]!; i++ }
+        else if (args[i] === '--to' && args[i + 1]) { toISO = args[i + 1]!; i++ }
+        else if (args[i] === '--path' && args[i + 1]) { repoPath = args[i + 1]!; i++ }
+      }
+      if (!fromISO) {
+        try {
+          fromISO = execFileSync('git', ['log', '-1', '--format=%cI'], {
+            encoding: 'utf-8', timeout: 10000, cwd: repoPath,
+          }).trim()
+        } catch {
+          console.error(JSON.stringify({ error: 'no_previous_commit' }))
+          process.exit(1)
+        }
+      }
+
+      const from = fromISO ? Date.parse(fromISO) : undefined
+      const to = toISO ? Date.parse(toISO) : undefined
+
+      const files = await scanSessionFiles({
+        dateRange: { from: fromISO?.split('T')[0], to: toISO?.split('T')[0] },
+        scope: 'default',
+        basePath: repoPath,
+        tz: getSystemTimezone(),
+        includeSubagents: false,
+      })
+
+      const turns = []
+      for (const f of files) {
+        const raw = await readRawMessages(f.path)
+        turns.push(...buildTurns(raw, f.sessionId.slice(0, 8), from, to))
+      }
+      turns.sort((a, b) => a.ts.localeCompare(b.ts))
+
+      console.log(JSON.stringify({
+        window: { from: fromISO, to: toISO ?? null },
+        turns,
+      }, null, 2))
+      break
+    }
+
     default:
-      console.error('Usage: bun run src/cli.ts [scan|recap-commit|prepare-facets|render-report] [--from DATE] [--to DATE] [--scope default|with-subfolder|all] [--path PATH] [--tz TIMEZONE]')
+      console.error('Usage: bun run src/cli.ts [scan|summarize|recap-commit|commit-log|prepare-facets|render-report] [--from DATE] [--to DATE] ...')
       process.exit(1)
   }
 }

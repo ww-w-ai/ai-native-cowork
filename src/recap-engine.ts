@@ -254,8 +254,9 @@ export async function runRecapPipeline(
 
 export async function runCommitRecapPipeline(
   sinceISO: string,
+  basePath?: string,
 ): Promise<RecapData> {
   // Commit recap: scan only current project, from last commit date
   const fromDate = sinceISO.split('T')[0]!
-  return runRecapPipeline({ from: fromDate }, 'cwd')
+  return runRecapPipeline({ from: fromDate }, 'default', basePath)
 }
