@@ -7,6 +7,7 @@ allowedTools:
   - Glob
   - Grep
   - Write
+  - Edit
 ---
 
 You are creating a git commit that includes an **AI collaboration recap** — a record of how the developer collaborated with AI to produce this commit's changes.
@@ -14,10 +15,13 @@ You are creating a git commit that includes an **AI collaboration recap** — a 
 ## Step 1: Run the Engine
 
 ```bash
-cd ${CLAUDE_PLUGIN_ROOT} && bun run src/cli.ts recap-commit
+ENGINE=/Users/taehyoungkim/Documents/DEV/ww-w-ai/www-cowork/src/cli.ts
+bun run "$ENGINE" recap-commit --path "$PWD"
 ```
 
-This scans sessions since the last git commit and outputs JSON with metrics and user prompts.
+This scans sessions since the last git commit **in the current project** and outputs JSON
+with metrics and user prompts. Do NOT `cd` into the plugin dir — the engine must target
+the user's repo via `--path`.
 
 - If output contains `{"error": "no_previous_commit"}`, tell the user to use `/commit` instead.
 - If `sessions` is 0, tell the user no sessions were found since the last commit.
@@ -92,6 +96,34 @@ Skip routine prompts: "ok", "yes", "continue", "fix that error", "looks good"
 
 Keep the block under ~1500 words. Key prompts are the most valuable part.
 
+## Step 4.5: Write the directive-log file (forward)
+
+Run the engine to get full-depth directives since the last commit:
+
+```bash
+ENGINE=/Users/taehyoungkim/Documents/DEV/ww-w-ai/www-cowork/src/cli.ts
+bun run "$ENGINE" commit-log --path "$PWD"
+```
+
+This outputs `{ window, turns }`. Each turn has `ts`, `sessionId`, `line`, `userText`,
+`isReactive`, optional `precedingAssistant` / `options` / `decision`.
+
+1. If `turns` is empty, skip the file (still create the commit with the message recap).
+2. **`slug`** — a SHORT ENGLISH descriptor coined from the commit subject's meaning,
+   lowercase, words joined by `-`, ≤ 50 chars. Do NOT mechanically slugify a Korean subject.
+3. **timestamp** — "now" in KST as `YYYYMMDD-HHMMSS`:
+   ```bash
+   TS=$(TZ=Asia/Seoul date +%Y%m%d-%H%M%S)
+   ```
+4. **filename** = `docs/commit-log/$TS-$slug.md`. If that file already exists, append `-2`.
+5. Write the file using the template in `references/commit-log-format.md` — verbatim user
+   text, 🤖 assistant context on reactive turns, `[sessionId Ln]` source markers, in `turns`
+   order. Header `일시(KST)` = `TZ=Asia/Seoul date "+%Y-%m-%d %H:%M:%S"`.
+6. Update `docs/commit-log/README.md` — append one row; create the file with header if absent.
+7. Stage both: `git add "docs/commit-log/$TS-$slug.md" docs/commit-log/README.md`
+
+The file rides in the SAME commit created by Step 5.
+
 ## Step 5: Create the Commit
 
 1. Run `git status` and `git diff HEAD`
@@ -108,3 +140,28 @@ EOF
 ```
 
 Do not stage secrets (.env, credentials). Do not create empty commits.
+
+## Backfill mode (document past commits)
+
+Triggered when the user asks to backfill / document existing commits.
+
+```bash
+ENGINE=/Users/taehyoungkim/Documents/DEV/ww-w-ai/www-cowork/src/cli.ts
+```
+
+1. List commits: `git log --format='%H %cI %s' --no-merges`.
+2. Read existing `docs/commit-log/` filenames; parse `YYYYMMDD-HHMMSS` prefixes → documented timestamps.
+3. Undocumented = commits with no matching doc. If > 8, ask the user which to document.
+4. For each target commit C (committer time `C_cI`) with previous commit P (`P_cI`):
+   ```bash
+   bun run "$ENGINE" commit-log --path "$PWD" --from "$P_cI" --to "$C_cI"
+   ```
+   For the first commit (no P), omit `--from`.
+5. Filename from C's committer time in KST:
+   ```bash
+   TS=$(TZ=Asia/Seoul date -j -f '%Y-%m-%dT%H:%M:%S%z' "${C_cI}" +%Y%m%d-%H%M%S 2>/dev/null)
+   ```
+6. Write `docs/commit-log/$TS-<slug>.md` (slug = short English descriptor). On collision append `-2`.
+   The commit hash MAY be included in the body (commit already exists — no paradox).
+7. Update `docs/commit-log/README.md` (time order, append-only).
+8. Commit: `git add docs/commit-log/ && git commit -m "docs(commit-log): backfill <range>"`
