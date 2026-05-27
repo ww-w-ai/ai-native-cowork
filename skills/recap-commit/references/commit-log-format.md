@@ -18,6 +18,23 @@ words joined by `-`, ≤ 50 chars. Commit subjects here are usually Korean; a me
 - **일시(KST)**: YYYY-MM-DD HH:MM:SS
 - **세션**: `<sessionId>`[, `<sessionId>` …]
 
+## 리캡
+
+| 항목 | 값 |
+|------|-----|
+| 세션 | N개, X.Xh |
+| 메시지 | M개 (유저 U / 어시스턴트 A) |
+| 도구 | <top 3 tools with counts> |
+| 라인 | +A / -R |
+
+**요약**: <2-3문장 — 이 커밋에서 무엇을 했고, 어떤 결정이 핵심이었는지>
+
+**마찰**: <friction이 있었으면 한 줄 설명, 없으면 "없음">
+
+---
+
+## 지시 이력
+
 > 시간순 verbatim 전사. `>` = 유저 원문. 🤖 = 직전 어시스턴트(축약, 유저가 응답한 경우만).
 
 ---

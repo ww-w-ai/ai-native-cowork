@@ -116,9 +116,12 @@ This outputs `{ window, turns }`. Each turn has `ts`, `sessionId`, `line`, `user
    TS=$(TZ=Asia/Seoul date +%Y%m%d-%H%M%S)
    ```
 4. **filename** = `docs/commit-log/$TS-$slug.md`. If that file already exists, append `-2`.
-5. Write the file using the template in `references/commit-log-format.md` — verbatim user
-   text, 🤖 assistant context on reactive turns, `[sessionId Ln]` source markers, in `turns`
-   order. Header `일시(KST)` = `TZ=Asia/Seoul date "+%Y-%m-%d %H:%M:%S"`.
+5. Write the file using the template in `references/commit-log-format.md`:
+   - **리캡 섹션** (상단): Step 1의 engine 출력에서 세션 수, 시간, 메시지 수, 도구 top 3,
+     라인 변경량을 표로 채우고, 2-3문장 요약 + 마찰 항목 작성.
+   - **지시 이력 섹션**: verbatim user text, 🤖 assistant context on reactive turns,
+     `[sessionId Ln]` source markers, in `turns` order.
+   - Header `일시(KST)` = `TZ=Asia/Seoul date "+%Y-%m-%d %H:%M:%S"`.
 6. Update `docs/commit-log/README.md` — append one row; create the file with header if absent.
 7. Stage both: `git add "docs/commit-log/$TS-$slug.md" docs/commit-log/README.md`
 
