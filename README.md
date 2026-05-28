@@ -14,7 +14,7 @@ standup busywork. It runs entirely on data you already have.
 | Capability | What you get | Status |
 |------------|--------------|:------:|
 | **`/cowork-insights`** | Narrative HTML + Markdown report of any time range — key prompts verbatim, per-session assessment, tool/token/cost charts. Paste into Jira, Notion, Slack. Weekly/monthly reviews. | ✅ shipped |
-| **`/cowork-commit`** | Two artifacts in one commit: ① `<details>` recap block in the commit message (key prompts + assessment) ② verbatim directive-log file under `docs/commit-log/` with mini-recap stats + full instruction transcript. Backfill mode documents past commits. | ✅ shipped |
+| **`/cowork-commit`** | Two artifacts in one commit: ① `<details>` recap block in the commit message (key decision quotes + metrics) ② directive-log file under `docs/commit-log/` — conversation log first (cause), recap second (result). `--language` option for recap language. Backfill mode documents past commits. | ✅ shipped |
 | **www-wiki / taise integration** | When the [www-wiki] vault or [taise] harness is installed, cowork-insights output and directive logs file themselves into your knowledge base. Standalone otherwise. | 🛠 planned |
 
 ## Why it's different
@@ -71,6 +71,7 @@ git clone https://github.com/ww-w-ai/ai-native-cowork.git
 /cowork-insights --from 1m --scope all              # Last month, every project
 /cowork-insights 최근 1주일, 전체 프로젝트, 한국어로   # Natural language, any language
 /cowork-commit                             # Recap + directive log in your next commit
+/cowork-commit --language ko               # Recap in Korean (default: conversation language)
 /cowork-commit backfill                    # Document past commits retroactively
 ```
 

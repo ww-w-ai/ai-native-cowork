@@ -65,6 +65,9 @@ words joined by `-`, ≤ 50 chars. Commit subjects here are usually Korean; a me
 - Group consecutive turns under a section heading only if it aids reading; otherwise list
   them flat in time order.
 - **Conversation Log comes first** (cause), **Recap comes after** (result).
+- **Language**: Conversation Log is always verbatim (original language). Recap section
+  (Summary, Friction, Assessment) follows the `--language` option if given, otherwise
+  matches the language the user spoke in the conversation.
 
 ## README index (`docs/commit-log/README.md`)
 Maintain a table; append/update one row per doc. Never rewrite existing rows.

@@ -12,6 +12,13 @@ allowedTools:
 
 You are creating a git commit that includes an **AI collaboration recap** — a record of how the developer collaborated with AI to produce this commit's changes.
 
+## Language
+
+The user may specify a language: `/cowork-commit --language ko` (or `en`, `ja`, etc.).
+If omitted, match the language the user has been speaking in this conversation.
+This affects the **Recap section** (Summary, Friction, Assessment) and the **commit message body**.
+The **Conversation Log** is always verbatim — never translate user/assistant text.
+
 ## Step 1: Run the Engine
 
 ```bash
