@@ -1,13 +1,13 @@
-# www-cowork
+# ai-native-cowork
 
 > **The work-collaboration harness for Claude Code.** Your AI sessions already hold the
-> full story of how the work got done — www-cowork turns that history into shareable
+> full story of how the work got done — ai-native-cowork turns that history into shareable
 > reports and per-commit directive logs your whole team can learn from.
 
 You shipped a week of work with Claude. Friday comes — what did you actually do, what
 worked, and *why* did each commit happen? The transcripts know. Nothing else does.
 
-**www-cowork reads your own session history and gives the answer back** — as a polished
+**ai-native-cowork reads your own session history and gives the answer back** — as a polished
 report, and as a verbatim record attached to every commit. No new note-taking. No
 standup busywork. It runs entirely on data you already have.
 
@@ -19,7 +19,7 @@ standup busywork. It runs entirely on data you already have.
 
 ## Why it's different
 
-Most "AI usage" tools count tokens. www-cowork preserves **the prompts, verbatim** — the
+Most "AI usage" tools count tokens. ai-native-cowork preserves **the prompts, verbatim** — the
 actual decisions, pivots, and root-cause insights — because that's the part a teammate can
 learn from. It's a clean-room reimplementation of Claude Code's internal `insights`, with
 date ranges, per-session assessments, cost ROI, multi-language output, and Markdown built
@@ -45,7 +45,7 @@ Add the ww-w-ai marketplace to your Claude Code settings, then enable the plugin
     }
   },
   "enabledPlugins": {
-    "www-cowork@ww-w-ai": true
+    "ai-native-cowork@ww-w-ai": true
   }
 }
 ```
@@ -55,9 +55,9 @@ Restart Claude Code — the plugin downloads automatically.
 **Manual install:**
 
 ```bash
-git clone https://github.com/ww-w-ai/www-cowork.git
+git clone https://github.com/ww-w-ai/ai-native-cowork.git
 # Add to settings.json:
-# "www-cowork@local:/path/to/www-cowork": true
+# "ai-native-cowork@local:/path/to/ai-native-cowork": true
 ```
 
 **Requirements:** [Claude Code](https://claude.ai/claude-code) v2.1.71+ · [Bun](https://bun.sh) (TypeScript engine).
@@ -114,7 +114,7 @@ trends survive even after the original session files are deleted.
 ## Architecture
 
 ```
-www-cowork/
+ai-native-cowork/
 ├── .claude-plugin/plugin.json   # Plugin manifest
 ├── manifest.json
 ├── skills/
@@ -161,7 +161,7 @@ MIT
 ---
 
 *Part of the **ww-w-ai** ecosystem — [www-wiki] (knowledge vault) · [taise] (librarian +
-secretary harness) · **www-cowork** (work collaboration). Your reports are yours. Share
+secretary harness) · **ai-native-cowork** (work collaboration). Your reports are yours. Share
 them, analyze them, learn from them.*
 
 [www-wiki]: #

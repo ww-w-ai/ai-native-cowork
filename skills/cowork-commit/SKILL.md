@@ -15,7 +15,7 @@ You are creating a git commit that includes an **AI collaboration recap** — a 
 ## Step 1: Run the Engine
 
 ```bash
-ENGINE=/Users/taehyoungkim/Documents/DEV/ww-w-ai/www-cowork/src/cli.ts
+ENGINE=/Users/taehyoungkim/Documents/DEV/ww-w-ai/ai-native-cowork/src/cli.ts
 bun run "$ENGINE" cowork-commit --path "$PWD"
 ```
 
@@ -101,7 +101,7 @@ Keep the block under ~1500 words. Key prompts are the most valuable part.
 Run the engine to get full-depth directives since the last commit:
 
 ```bash
-ENGINE=/Users/taehyoungkim/Documents/DEV/ww-w-ai/www-cowork/src/cli.ts
+ENGINE=/Users/taehyoungkim/Documents/DEV/ww-w-ai/ai-native-cowork/src/cli.ts
 bun run "$ENGINE" commit-log --path "$PWD"
 ```
 
@@ -149,7 +149,7 @@ Do not stage secrets (.env, credentials). Do not create empty commits.
 Triggered when the user asks to backfill / document existing commits.
 
 ```bash
-ENGINE=/Users/taehyoungkim/Documents/DEV/ww-w-ai/www-cowork/src/cli.ts
+ENGINE=/Users/taehyoungkim/Documents/DEV/ww-w-ai/ai-native-cowork/src/cli.ts
 ```
 
 1. List commits: `git log --format='%H %cI %s' --no-merges`.

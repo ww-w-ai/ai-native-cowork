@@ -29,7 +29,7 @@ Parse the user's request to determine these flags:
 Run a **single command**. This handles everything: data collection, parallel LLM generation, assembly, and rendering.
 
 ```bash
-cd /Users/taehyoungkim/Documents/DEV/ww-w-ai/www-cowork && bun run src/generate-narrative.ts \
+cd /Users/taehyoungkim/Documents/DEV/ww-w-ai/ai-native-cowork && bun run src/generate-narrative.ts \
   --from <FROM> --to <TO> \
   --scope <SCOPE> --path <PATH> \
   --exclude-path <EXCLUDE> \
