@@ -15,54 +15,62 @@ words joined by `-`, ≤ 50 chars. Commit subjects here are usually Korean; a me
 ```markdown
 # <commit subject>
 
-- **일시(KST)**: YYYY-MM-DD HH:MM:SS
-- **세션**: `<sessionId>`[, `<sessionId>` …]
-
-## 리캡
-
-| 항목 | 값 |
-|------|-----|
-| 세션 | N개, X.Xh |
-| 메시지 | M개 (유저 U / 어시스턴트 A) |
-| 도구 | <top 3 tools with counts> |
-| 라인 | +A / -R |
-
-**요약**: <2-3문장 — 이 커밋에서 무엇을 했고, 어떤 결정이 핵심이었는지>
-
-**마찰**: <friction이 있었으면 한 줄 설명, 없으면 "없음">
+- **Date(KST)**: YYYY-MM-DD HH:MM:SS
+- **Sessions**: `<sessionId>`[, `<sessionId>` …]
 
 ---
 
-## 지시 이력
+## Conversation Log
 
-> 시간순 verbatim 전사. `>` = 유저 원문. 🤖 = 직전 어시스턴트(축약, 유저가 응답한 경우만).
+> Verbatim transcription in time order. `>` = user prompt. 🤖 = preceding assistant (truncated, only when user responded to it).
 
 ---
 
 **HH:MM [<sessionId> L<line>]**
 > <userText, verbatim>
 
-**HH:MM [<sessionId> L<line>]** — 어시스턴트 제안에 응답
+**HH:MM [<sessionId> L<line>]** — responding to assistant
 - 🤖 *"<precedingAssistant, truncated>"*
-- 🤖 *[선택지] <options joined by " / ">*   ← only when options present
-> **[선택] → "<decision>"**                ← only when decision present
+- 🤖 *[options] <options joined by " / ">*   ← only when options present
+> **[choice] → "<decision>"**                ← only when decision present
 > <userText if it adds beyond the decision>
+
+---
+
+## Recap
+
+| Item | Value |
+|------|-------|
+| Sessions | N, X.Xh |
+| Messages | M (user U / assistant A) |
+| Tools | <top 3 tools with counts> |
+| Lines | +A / -R |
+
+**Summary**: <2-3 sentences — what was done and what decisions were key>
+
+**Friction**: <one-line description if any, otherwise "None">
+
+**Assessment**:
+- **Goal**: <what user wanted>
+- **Outcome**: fully_achieved / mostly_achieved / partially_achieved / not_achieved
+- **AI Helpfulness**: essential / very_helpful / moderately_helpful / slightly_helpful / unhelpful
 ```
 
 ## Rules
 - Emit turns in `turns[]` order (already sorted by `ts`).
 - For non-reactive turns: just the `>` user line with its `[sessionId Ln]` marker.
 - For reactive turns (`isReactive: true`): show the 🤖 preceding-assistant line; if `options`
-  present, add the `[선택지]` line; if `decision` present, add the `[선택]` line.
+  present, add the `[options]` line; if `decision` present, add the `[choice]` line.
 - Keep user text verbatim — do not paraphrase. Assistant text may stay truncated as provided.
 - Group consecutive turns under a section heading only if it aids reading; otherwise list
   them flat in time order.
+- **Conversation Log comes first** (cause), **Recap comes after** (result).
 
 ## README index (`docs/commit-log/README.md`)
 Maintain a table; append/update one row per doc. Never rewrite existing rows.
 
 ```markdown
-| 일시(KST) | 요지 | 문서 |
-|-----------|------|------|
+| Date(KST) | Summary | Doc |
+|-----------|---------|-----|
 | YYYY-MM-DD HH:MM:SS | <commit subject> | [<slug>](./<filename>) |
 ```

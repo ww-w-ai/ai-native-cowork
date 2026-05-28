@@ -1,6 +1,6 @@
 ---
 name: cowork-commit
-description: Trigger whenever the user asks to commit AND wants the commit message enriched with AI collaboration history. Records key prompts verbatim, structured assessment (goal/outcome/friction), and summarizes the AI collaboration journey since the last commit as a collapsible <details> block on GitHub/GitLab PRs. The key signal is the combination of (1) making a commit with (2) capturing how AI contributed. Trigger on phrases like commit with AI recap, attach collaboration history to commit, record AI work in commit, cowork-commit. DO NOT trigger for plain commits without AI documentation, standalone time-period recaps (use cowork-insights instead), PR reviews, or general git operations.
+description: Trigger whenever the user asks to commit AND wants the commit message enriched with AI collaboration history. Creates a lightweight commit message (key decision highlights + link) and a full directive-log file with conversation transcript + recap. The key signal is the combination of (1) making a commit with (2) capturing how AI contributed. Trigger on phrases like commit with AI recap, attach collaboration history to commit, record AI work in commit, cowork-commit. DO NOT trigger for plain commits without AI documentation, standalone time-period recaps (use cowork-insights instead), PR reviews, or general git operations.
 allowedTools:
   - Bash
   - Read
@@ -26,77 +26,26 @@ the user's repo via `--path`.
 - If output contains `{"error": "no_previous_commit"}`, tell the user to use `/commit` instead.
 - If `sessions` is 0, tell the user no sessions were found since the last commit.
 
-## Step 2: Select Key Prompts (2-3)
+## Step 2: Format the Commit Message
 
-From the `userPrompts` array, pick **2-3 that most influenced the outcome**:
-
-1. **Direction changes**: "actually, let's use X instead"
-2. **Key decisions**: "let's use TypeScript", "split this into..."
-3. **Root causes**: "the real problem is..."
-4. **Crucial context**: "our API expects..."
-
-Copy text **exactly as written** — typos, mixed languages, informal tone preserved.
-
-Skip routine prompts: "ok", "yes", "continue", "fix that error", "looks good"
-
-## Step 3: Structured Assessment
-
-| Field | Options |
-|-------|---------|
-| **Goal** | Free text |
-| **Outcome** | `fully_achieved` / `mostly_achieved` / `partially_achieved` / `not_achieved` |
-| **AI Helpfulness** | `essential` / `very_helpful` / `moderately_helpful` / `slightly_helpful` / `unhelpful` |
-| **Friction** | `misunderstood_request` / `wrong_approach` / `buggy_code` / `user_rejected_action` / `excessive_changes` / `none` |
-
-## Step 4: Format the Recap Block
+From the `userPrompts` array, pick **2-3 key conversation lines** that reveal the
+decision-making — direction changes, pivots, root causes. Summarize each in one line.
 
 ```
 <details>
 <summary>AI Recap — N sessions, X.Xh, M messages, +A/-R lines</summary>
 
-## Summary
-[2-3 sentences]
+- "user's key decision quote" → what happened as a result
+- "another pivotal quote" → outcome
 
-## Key Prompts
-
-**Prompt 1**: [why pivotal]
-> [exact user prompt, verbatim]
-
--> [what AI did, 1-2 sentences]
-
-**Prompt 2**: [why pivotal]
-> [exact user prompt, verbatim]
-
--> [what AI did, 1-2 sentences]
-
-## Other Prompts
-[1 paragraph grouping by theme with counts]
-
-## AI Contribution
-- **Tools**: [top tools with counts and pattern description]
-- **Approach**: [how AI tackled this]
-- **Friction**: [what went wrong, or "None"]
-
-## Assessment
-- **Goal**: [what user wanted]
-- **Outcome**: [level]
-- **AI Helpfulness**: [level]
-- **Friction**: [types or "None"]
-
-## Learnings
-[1-2 sentences]
-
-## Stats
-- Sessions: N | Messages: M | Duration: X.Xh
-- Tools: [top 5]
-- Lines: +A / -R
-
+📄 Full log: docs/commit-log/<filename>.md
 </details>
 ```
 
-Keep the block under ~1500 words. Key prompts are the most valuable part.
+Keep the commit message body **under 10 lines**. The full conversation and recap
+live in the directive-log file (Step 3), not in the commit message.
 
-## Step 4.5: Write the directive-log file (forward)
+## Step 3: Write the directive-log file (forward)
 
 Run the engine to get full-depth directives since the last commit:
 
@@ -117,17 +66,18 @@ This outputs `{ window, turns }`. Each turn has `ts`, `sessionId`, `line`, `user
    ```
 4. **filename** = `docs/commit-log/$TS-$slug.md`. If that file already exists, append `-2`.
 5. Write the file using the template in `references/commit-log-format.md`:
-   - **리캡 섹션** (상단): Step 1의 engine 출력에서 세션 수, 시간, 메시지 수, 도구 top 3,
-     라인 변경량을 표로 채우고, 2-3문장 요약 + 마찰 항목 작성.
-   - **지시 이력 섹션**: verbatim user text, 🤖 assistant context on reactive turns,
+   - **Conversation Log** (top): verbatim user text, 🤖 assistant context on reactive turns,
      `[sessionId Ln]` source markers, in `turns` order.
-   - Header `일시(KST)` = `TZ=Asia/Seoul date "+%Y-%m-%d %H:%M:%S"`.
+   - **Recap** (bottom): from Step 1 engine output — sessions, duration, messages, top 3 tools,
+     lines changed as a table, 2-3 sentence summary, friction, and assessment
+     (goal/outcome/helpfulness).
+   - Header `Date(KST)` = `TZ=Asia/Seoul date "+%Y-%m-%d %H:%M:%S"`.
 6. Update `docs/commit-log/README.md` — append one row; create the file with header if absent.
 7. Stage both: `git add "docs/commit-log/$TS-$slug.md" docs/commit-log/README.md`
 
-The file rides in the SAME commit created by Step 5.
+The file rides in the SAME commit created by Step 4.
 
-## Step 5: Create the Commit
+## Step 4: Create the Commit
 
 1. Run `git status` and `git diff HEAD`
 2. Stage relevant files (prefer specific files over `git add -A`)
@@ -137,7 +87,7 @@ The file rides in the SAME commit created by Step 5.
 git commit -m "$(cat <<'EOF'
 <concise commit title>
 
-<recap block from Step 4>
+<recap block from Step 2>
 EOF
 )"
 ```
