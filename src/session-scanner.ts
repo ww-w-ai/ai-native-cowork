@@ -211,7 +211,7 @@ export async function scanSessionFiles(
   try {
     const entries = await readdir(projectsDir, { withFileTypes: true })
     projectDirs = entries
-      .filter(e => e.isDirectory())
+      .filter(e => e.isDirectory() || e.isSymbolicLink())
       .filter(e => {
         // Exclude check first (applies to all modes)
         if (isExcluded(e.name, excludeHashes)) return false
