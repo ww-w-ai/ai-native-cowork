@@ -1,7 +1,7 @@
 {
   "name": "www-cowork",
   "version": "1.1.0",
-  "description": "Work-collaboration harness for Claude Code. /www-insights for AI session reports + /www-commit for per-commit verbatim directive logs; integrates with www-wiki / taise when present, runs standalone otherwise.",
+  "description": "Work-collaboration harness for Claude Code. /cowork-insights for AI session reports + /cowork-commit for per-commit verbatim directive logs; integrates with www-wiki / taise when present, runs standalone otherwise.",
   "author": "ww-w-ai",
   "skills": ["skills/"],
   "agents": [],

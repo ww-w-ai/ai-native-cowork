@@ -1,6 +1,6 @@
 ---
-name: www-commit
-description: Trigger whenever the user asks to commit AND wants the commit message enriched with AI collaboration history. Records key prompts verbatim, structured assessment (goal/outcome/friction), and summarizes the AI collaboration journey since the last commit as a collapsible <details> block on GitHub/GitLab PRs. The key signal is the combination of (1) making a commit with (2) capturing how AI contributed. Trigger on phrases like commit with AI recap, attach collaboration history to commit, record AI work in commit, www-commit. DO NOT trigger for plain commits without AI documentation, standalone time-period recaps (use www-insights instead), PR reviews, or general git operations.
+name: cowork-commit
+description: Trigger whenever the user asks to commit AND wants the commit message enriched with AI collaboration history. Records key prompts verbatim, structured assessment (goal/outcome/friction), and summarizes the AI collaboration journey since the last commit as a collapsible <details> block on GitHub/GitLab PRs. The key signal is the combination of (1) making a commit with (2) capturing how AI contributed. Trigger on phrases like commit with AI recap, attach collaboration history to commit, record AI work in commit, cowork-commit. DO NOT trigger for plain commits without AI documentation, standalone time-period recaps (use cowork-insights instead), PR reviews, or general git operations.
 allowedTools:
   - Bash
   - Read
@@ -16,7 +16,7 @@ You are creating a git commit that includes an **AI collaboration recap** — a 
 
 ```bash
 ENGINE=/Users/taehyoungkim/Documents/DEV/ww-w-ai/www-cowork/src/cli.ts
-bun run "$ENGINE" www-commit --path "$PWD"
+bun run "$ENGINE" cowork-commit --path "$PWD"
 ```
 
 This scans sessions since the last git commit **in the current project** and outputs JSON
