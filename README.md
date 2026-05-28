@@ -124,7 +124,7 @@ ai-native-cowork/
 │       └── references/
 │           └── commit-log-format.md  # Verbatim transcription template
 ├── src/                         # Bun + TypeScript engine
-│   ├── cli.ts                   # CLI entry (scan, summarize, www-commit, commit-log, prepare-facets, render-report)
+│   ├── cli.ts                   # CLI entry (scan, summarize, cowork-commit, commit-log, prepare-facets, render-report)
 │   ├── commit-log.ts            # Directive extraction: buildTurns, synthetic filters, reactive pairing
 │   ├── commit-log.test.ts       # 16 unit tests (bun:test)
 │   ├── session-scanner.ts       # Streaming JSONL parser, path matching, date filtering
