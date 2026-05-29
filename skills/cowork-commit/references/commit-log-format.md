@@ -22,7 +22,7 @@ words joined by `-`, ≤ 50 chars. Commit subjects here are usually Korean; a me
 
 ## Conversation Log
 
-> Verbatim transcription in time order. `>` = user prompt. 🤖 = preceding assistant (truncated, only when user responded to it).
+> Verbatim, time order, **kept turns only** (SKILL.md Step 3a — sensitive/off-topic turns dropped whole, no placeholder). `>` = user prompt. 🤖 = preceding assistant (truncated, only when user responded to it).
 
 ---
 
@@ -57,6 +57,7 @@ words joined by `-`, ≤ 50 chars. Commit subjects here are usually Korean; a me
 ```
 
 ## Rules
+- **Scope-filter first** (SKILL.md Step 3a): emit only development-relevant turns; drop sensitive/off-topic whole (reactive turns: judge the included assistant context too).
 - Emit turns in `turns[]` order (already sorted by `ts`).
 - For non-reactive turns: just the `>` user line with its `[sessionId Ln]` marker.
 - For reactive turns (`isReactive: true`): show the 🤖 preceding-assistant line; if `options`
@@ -65,7 +66,7 @@ words joined by `-`, ≤ 50 chars. Commit subjects here are usually Korean; a me
 - Group consecutive turns under a section heading only if it aids reading; otherwise list
   them flat in time order.
 - **Conversation Log comes first** (cause), **Recap comes after** (result).
-- **Language**: Conversation Log is always verbatim (original language). Recap section
+- **Language**: kept turns in the Conversation Log are always verbatim (original language). Recap section
   (Summary, Friction, Assessment) follows the `--language` option if given, otherwise
   matches the language the user spoke in the conversation.
 
