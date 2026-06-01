@@ -5,7 +5,7 @@ Claude Code plugin that records AI collaboration history per commit.
 ## Project Overview
 
 - **Type**: Claude Code plugin (skills + TypeScript engine)
-- **Version**: 1.6.1
+- **Version**: 1.6.2
 - **Runtime**: Bun (TypeScript, no package.json — uses manifest.json)
 - **Skills**: `/cowork-commit` (per-commit AI recap), `/cowork-insights` (session reports), `/cowork-sprint` (plan→execute sprint orchestrator), `/cowork-doc-sync` + `/cowork-doc-init` (docs/ organization)
 - **Agents**: `cowork-intent-auditor` (fixed, fresh-perspective Tier-2 intent audit)
