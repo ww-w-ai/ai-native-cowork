@@ -17,7 +17,7 @@ standup busywork. It runs entirely on data you already have.
 | **`/cowork-commit`** | Two artifacts in one commit: ① `<details>` recap block in the commit message (key decision quotes + metrics) ② directive-log file under `docs/commit-log/` — conversation log first (cause), recap second (result). `--language` option for recap language. Backfill mode documents past commits. | ✅ shipped |
 | **`/cowork-sprint`** | Plan-then-execute sprint orchestrator: you co-plan the whole roadmap, then it runs each sprint through research→plan→design→do→QA→**intent-audit**→deploy autonomously. **Discovers or scaffolds purpose-fit agents** instead of defaulting to `general-purpose` — so every sprint grows your reusable agent roster. | ✅ shipped |
 | **`/cowork-doc-sync` + `/cowork-doc-init`** | Keep `docs/` aligned to current reality: numbered taxonomy (00-reference…99-misc), LIVING/FROZEN status labels, cross-session drift replay. | ✅ shipped |
-| **www-wiki / taise integration** | When the [www-wiki] vault or [taise] harness is installed, cowork-insights output and directive logs file themselves into your knowledge base. Standalone otherwise. | 🛠 planned |
+| **www-wiki / taise integration** | When the **www-wiki** vault or **taise** harness is installed, cowork-insights output and directive logs file themselves into your knowledge base. Standalone otherwise. | 🛠 planned |
 
 ## Why it's different
 
@@ -178,10 +178,8 @@ MIT
 
 ---
 
-*Part of the **ww-w-ai** ecosystem — [www-wiki] (knowledge vault) · [taise] (librarian +
+*Part of the **ww-w-ai** ecosystem — **www-wiki** (knowledge vault) · **taise** (librarian +
 secretary harness) · **ai-native-cowork** (work collaboration). Your reports are yours. Share
 them, analyze them, learn from them.*
 
-[www-wiki]: #
-[taise]: #
 [anthropics/claude-code#19972]: https://github.com/anthropics/claude-code/issues/19972

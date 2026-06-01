@@ -5,27 +5,38 @@ Claude Code plugin that records AI collaboration history per commit.
 ## Project Overview
 
 - **Type**: Claude Code plugin (skills + TypeScript engine)
-- **Version**: 1.6.0
+- **Version**: 1.6.1
 - **Runtime**: Bun (TypeScript, no package.json — uses manifest.json)
-- **Skills**: `/cowork-commit` (per-commit AI recap), `/cowork-insights` (session reports)
+- **Skills**: `/cowork-commit` (per-commit AI recap), `/cowork-insights` (session reports), `/cowork-sprint` (plan→execute sprint orchestrator), `/cowork-doc-sync` + `/cowork-doc-init` (docs/ organization)
+- **Agents**: `cowork-intent-auditor` (fixed, fresh-perspective Tier-2 intent audit)
+- **Hooks**: SessionStart agent-first guidance (`hooks/`)
 
 ## Architecture
 
 ```
-manifest.json              # Plugin metadata (name, version, skills, scripts)
+manifest.json              # Plugin metadata (name, version, skills, agents, hooks, scripts)
 .claude-plugin/plugin.json # CC plugin registry entry
 skills/
-  cowork-commit/SKILL.md   # Commit skill instructions
-  cowork-insights/SKILL.md # Insights skill instructions
+  cowork-commit/SKILL.md   # Per-commit AI recap + directive log
+  cowork-insights/SKILL.md # Session insight reports
+  cowork-sprint/           # Plan→execute sprint orchestrator (SKILL.md + references/ + templates/)
+  cowork-doc-sync/         # docs/ alignment (SKILL.md + references/ + scripts/)
+  cowork-doc-init/SKILL.md # One-time docs/ taxonomy bootstrap
+agents/
+  cowork-intent-auditor.md # Fixed Tier-2 intent auditor (fresh-perspective, read-only)
+hooks/
+  hooks.json               # SessionStart wiring
+  session-start.sh         # Agent-first guidance injected as additionalContext
 src/
-  cli.ts                   # Entry point — subcommands: cowork-commit, commit-log, cowork-insights
+  cli.ts                   # Entry point — engine subcommands: cowork-commit, commit-log, summarize, scan, render-report
   recap-engine.ts          # Session scanner + metrics aggregator
-  session-scanner.ts       # ~/.claude/projects/ JSONL discovery
+  session-scanner.ts       # ~/.claude/projects/ JSONL discovery + getClaudeHome
   commit-log.ts            # Conversation turn extraction from JSONL
   metrics-extractor.ts     # Tool counts, tokens, response times from JSONL
+  git-analyzer.ts          # Per-commit git insertion/deletion stats
   facet-cache.ts           # Per-session metrics cache
-  generate-narrative.ts    # cowork-insights narrative builder
-  html-report.ts           # HTML report renderer
+  generate-narrative.ts    # cowork-insights pipeline driver (summarize → LLM → render)
+  html-report.ts           # HTML + Markdown report renderer
 docs/commit-log/           # Directive-log files (conversation + recap per commit)
 evals/                     # Skill trigger accuracy tests
 ```
