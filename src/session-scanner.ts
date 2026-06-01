@@ -160,7 +160,7 @@ function getProjectsDir(): string {
 /**
  * Convert an absolute filesystem path to the project hash used by Claude Code.
  * CC's sanitizePath replaces ALL non-alphanumeric chars with `-`.
- * e.g. "/Users/kim/Documents/TAE/KStarLive 사건 대응" → "-Users-kim-Documents-TAE-KStarLive------"
+ * e.g. "/Users/kim/Documents/My Project (v2)" → "-Users-kim-Documents-My-Project--v2-"
  */
 export function pathToProjectHash(absPath: string): string {
   return absPath.replace(/[^a-zA-Z0-9]/g, '-')

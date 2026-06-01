@@ -17,7 +17,9 @@ import { execFile } from 'child_process'
 import { writeFile, readFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { randomBytes } from 'crypto'
+import { tmpdir } from 'os'
 import { generateFullReport, generateMarkdownReport, type NarrativeData, type ScanData } from './html-report.js'
+import { getClaudeHome } from './session-scanner.js'
 
 const PLUGIN_ROOT = join(import.meta.dir, '..')
 
@@ -150,7 +152,7 @@ async function main() {
 
   // Parse args
   let format = 'full'
-  let language = '한국어'
+  let language = 'ko'
   let model = 'opus'
   let outputBase = ''
   const passthrough: string[] = []  // args to pass to summarize
@@ -168,7 +170,7 @@ async function main() {
   console.error(`[recap] Starting ${format} report in ${language} (model: ${model})...`)
 
   // ─── Step 1: Run summarize ───
-  const scanOutputPath = `/tmp/recap-scan-${runId}.json`
+  const scanOutputPath = join(tmpdir(), `recap-scan-${runId}.json`)
   const summarizeArgs = ['run', 'src/cli.ts', 'summarize', ...passthrough, '--scan-output', scanOutputPath]
   console.error(`[recap] Step 1: Summarizing sessions...`)
   const step1Start = Date.now()
@@ -352,7 +354,7 @@ Respond with ONLY a JSON object.`
   // ─── Step 5: Save and render ───
   console.error(`[recap] Step 5: Rendering...`)
 
-  const narrativePath = `/tmp/recap-narrative-${runId}.json`
+  const narrativePath = join(tmpdir(), `recap-narrative-${runId}.json`)
   await writeFile(narrativePath, JSON.stringify(narrative, null, 2), { encoding: 'utf-8', mode: 0o600 })
 
   // Load scan data and add facets
@@ -372,7 +374,7 @@ Respond with ONLY a JSON object.`
 
   // Output paths
   if (!outputBase) {
-    const dir = join(process.env.HOME || '~', '.claude', 'recap-reports')
+    const dir = join(getClaudeHome(), 'recap-reports')
     await mkdir(dir, { recursive: true })
     const ts = new Date().toISOString().replace(/[-:]/g, '').replace('T', '_').slice(0, 15)
     outputBase = join(dir, `recap-${ts}`)

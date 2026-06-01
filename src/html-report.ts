@@ -111,13 +111,13 @@ export type NarrativeData = {
   }>
   translations?: {
     // Translate enum labels to target language
-    labels?: Record<string, string>  // e.g. "iterative_refinement" → "반복 개선"
+    labels?: Record<string, string>  // e.g. "iterative_refinement" -> localized display label
     // Translate session goals from facet cache
     sessionGoals?: Record<string, string>  // sessionId → translated goal
     // Translate fixed UI text
-    parallelWork?: string   // e.g. "최대 3개 세션 동시 실행. 작업 시간의 45%가 병렬"
-    costNote?: string       // e.g. "Cache Read는 토큰당 90% 저렴하지만..."
-    costSummary?: string    // e.g. "총 비용: ~$8,912 · Max $200/월 대비 $8,712 절약 (45배 ROI)"
+    parallelWork?: string   // e.g. "Peak 3 sessions at once; 45% of work time was parallel"
+    costNote?: string       // e.g. "Cache reads are ~90% cheaper per token, but ..."
+    costSummary?: string    // e.g. "Total: ~$8,912 · saved $8,712 vs Max $200/mo (45x ROI)"
   }
 }
 
@@ -148,7 +148,7 @@ export type ScanData = {
   }
   daysActive: number
   dayOfWeekCounts: number[]
-  concurrentPeriods: { count: number; totalMinutes: number; sessionsInvolved: number; pctOfMessages: number }
+  concurrentPeriods: { maxConcurrent: number; parallelMinutes: number; totalMinutes: number; parallelPct: number }
   toolCategories: Record<string, { count: number; tools: Record<string, number> }>
   responseTimeStats: {
     median: number
@@ -485,7 +485,7 @@ export function generateHtmlReport(
     <div class="stat-card"><div class="stat-value">${metrics.totalGitCommits}</div><div class="stat-label">Commits</div></div>
     <div class="stat-card"><div class="stat-value">+${metrics.totalLinesAdded}/-${metrics.totalLinesRemoved}</div><div class="stat-label">Lines</div></div>
     <div class="stat-card"><div class="stat-value">${tokenDisplay}</div><div class="stat-label">Tokens</div></div>
-    <div class="stat-card"><div class="stat-value">${metrics.daysActive}</div><div class="stat-label">Days Active</div></div>${metrics.concurrentPeriods.count > 0 ? `
+    <div class="stat-card"><div class="stat-value">${metrics.daysActive}</div><div class="stat-label">Days Active</div></div>${metrics.concurrentPeriods.maxConcurrent > 1 ? `
     <div class="stat-card"><div class="stat-value">${metrics.concurrentPeriods.maxConcurrent}</div><div class="stat-label">Peak Parallel</div></div>` : ''}
   </div>
 
@@ -1058,13 +1058,13 @@ export function generateFullReport(scan: ScanData, narrative: NarrativeData): st
   {
     const chartPairs: string[] = []
     chartPairs.push(renderResponseTimeHistogram(scan.responseTimeStats))
-    if (scan.concurrentPeriods.count > 0) {
+    if (scan.concurrentPeriods.maxConcurrent > 1) {
       chartPairs.push(`<div class="chart-card">
         <div class="chart-title">Multi-Clauding</div>
         <div style="font-size:14px;color:#475569;line-height:1.8">
-          <strong>${scan.concurrentPeriods.count}</strong> overlap events<br>
-          <strong>${scan.concurrentPeriods.sessionsInvolved}</strong> sessions involved<br>
-          <strong>${scan.concurrentPeriods.pctOfMessages.toFixed(1)}%</strong> of messages during overlaps
+          <strong>${scan.concurrentPeriods.maxConcurrent}</strong> peak parallel sessions<br>
+          <strong>${Math.round(scan.concurrentPeriods.parallelMinutes)}</strong> minutes of parallel work<br>
+          <strong>${scan.concurrentPeriods.parallelPct.toFixed(1)}%</strong> of the span was parallel
         </div>
       </div>`)
     }
@@ -1628,12 +1628,12 @@ export function generateMarkdownReport(scan: ScanData, narrative: NarrativeData)
   }
 
   // Multi-clauding
-  if (scan.concurrentPeriods.count > 0) {
+  if (scan.concurrentPeriods.maxConcurrent > 1) {
     lines.push(`### Multi-Clauding`)
     lines.push(``)
-    lines.push(`- **${scan.concurrentPeriods.count}** overlap events`)
-    lines.push(`- **${scan.concurrentPeriods.sessionsInvolved}** sessions involved`)
-    lines.push(`- **${scan.concurrentPeriods.pctOfMessages.toFixed(1)}%** of messages during overlaps`)
+    lines.push(`- **${scan.concurrentPeriods.maxConcurrent}** peak parallel sessions`)
+    lines.push(`- **${Math.round(scan.concurrentPeriods.parallelMinutes)}** minutes of parallel work`)
+    lines.push(`- **${scan.concurrentPeriods.parallelPct.toFixed(1)}%** of the span was parallel`)
     lines.push(``)
   }
 
