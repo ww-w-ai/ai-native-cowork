@@ -15,6 +15,8 @@ standup busywork. It runs entirely on data you already have.
 |------------|--------------|:------:|
 | **`/cowork-insights`** | Narrative HTML + Markdown report of any time range — key prompts verbatim, per-session assessment, tool/token/cost charts. Paste into Jira, Notion, Slack. Weekly/monthly reviews. | ✅ shipped |
 | **`/cowork-commit`** | Two artifacts in one commit: ① `<details>` recap block in the commit message (key decision quotes + metrics) ② directive-log file under `docs/commit-log/` — conversation log first (cause), recap second (result). `--language` option for recap language. Backfill mode documents past commits. | ✅ shipped |
+| **`/cowork-sprint`** | Plan-then-execute sprint orchestrator: you co-plan the whole roadmap, then it runs each sprint through research→plan→design→do→QA→**intent-audit**→deploy autonomously. **Discovers or scaffolds purpose-fit agents** instead of defaulting to `general-purpose` — so every sprint grows your reusable agent roster. | ✅ shipped |
+| **`/cowork-doc-sync` + `/cowork-doc-init`** | Keep `docs/` aligned to current reality: numbered taxonomy (00-reference…99-misc), LIVING/FROZEN status labels, cross-session drift replay. | ✅ shipped |
 | **www-wiki / taise integration** | When the [www-wiki] vault or [taise] harness is installed, cowork-insights output and directive logs file themselves into your knowledge base. Standalone otherwise. | 🛠 planned |
 
 ## Why it's different
@@ -29,6 +31,21 @@ engine renders HTML+MD), so output is consistent and fast — not LLM-written HT
 Origin: built in a single Claude Code session, validated across 3 A/B evaluation iterations
 against the original `insights` command (95 sessions, 5,943 messages, 4.6B tokens of real
 collaboration history).
+
+## Your agent legion compounds
+
+ai-native-cowork is built on one bet: **don't reach for `general-purpose` — reach for the right
+specialist, and if it doesn't exist yet, build it.** Whenever cowork needs a role (reviewer,
+researcher, migrator, auditor…), it first **discovers** an existing agent — project
+`.claude/agents/` → user `~/.claude/agents/` → every installed plugin — and only **scaffolds** a
+new project-local agent when there's no fit. Each scaffolded agent is version-controlled and
+discoverable the next time.
+
+The payoff is **compounding**: the longer you work, the larger and sharper your *personal agent
+legion* gets. Week one you have a handful; a month in you have a roster tuned to your exact stack
+and domain — reused, not re-derived. The plugin ships one fixed member to start
+(`cowork-intent-auditor`, a fresh-perspective auditor that checks work against its *intent*, not
+just the literal plan) and grows the rest alongside you.
 
 ## Install
 

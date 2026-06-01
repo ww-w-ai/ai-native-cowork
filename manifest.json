@@ -1,9 +1,10 @@
 {
   "name": "ai-native-cowork",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Work-collaboration harness for Claude Code. /cowork-sprint (plan→execute sprint orchestrator) + /cowork-insights (AI session reports) + /cowork-commit (verbatim directive logs) + /cowork-doc-sync (+/cowork-doc-init) (repo docs/ organization); integrates with www-wiki / taise / bkit when present, runs standalone otherwise.",
   "author": "ww-w-ai",
   "skills": ["skills/"],
   "agents": ["agents/"],
+  "hooks": ["hooks/"],
   "scripts": ["src/"]
 }
