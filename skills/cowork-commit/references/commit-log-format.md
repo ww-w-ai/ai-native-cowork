@@ -6,9 +6,9 @@ filename or body for forward mode** (a commit can't contain its own hash). Backf
 the hash in the body since those commits already exist.
 
 `slug` = a SHORT ENGLISH descriptor coined from the commit subject's meaning, lowercase,
-words joined by `-`, ≤ 50 chars. Commit subjects here are usually Korean; a mechanical
-`[^a-zA-Z0-9]→-` slug would strip Korean to empty, so coin a meaningful English slug instead
-(e.g. "런타임 노이즈 gitignore 추가" → `gitignore-noise`).
+words joined by `-`, ≤ 50 chars. Commit subjects are often non-English; a mechanical
+`[^a-zA-Z0-9]→-` slug would strip a non-Latin subject to empty, so coin a meaningful English
+slug from the subject's meaning instead (e.g. a "runtime-noise gitignore" subject → `gitignore-noise`).
 
 ## Template
 

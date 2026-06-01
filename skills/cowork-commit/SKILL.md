@@ -12,6 +12,12 @@ allowedTools:
 
 You are creating a git commit that includes an **AI collaboration recap** — a record of how the developer collaborated with AI to produce this commit's changes.
 
+## Why this skill exists (the lens for every keep/drop decision)
+
+The critical reason to use this skill: **when a different worker (or a future session) later touches this code, they must be able to recover the *intent* behind the previous worker's changes and continue with full context — instead of guessing/inferring it from the diff alone.** Lost intent is the core failure this skill prevents: a buried decision (why a value, why a cap removed, why this approach over the rejected one) that a successor cannot reconstruct becomes silent ambiguity later.
+
+So when deciding **what conversation to leave** (Step 2 message lines, Step 3a kept turns), do not ask only "was this substantive?" — ask **"would a future/different worker need this to understand WHY this was done and safely build on it?"** Keep the turns that carry *intent and the reasoning that won*; drop the turns that a successor would never need to continue the work. This intent-for-the-next-worker perspective is the primary filter, not an afterthought.
+
 ## Language
 
 The user may specify a language: `/cowork-commit --language ko` (or `en`, `ja`, etc.).
@@ -37,7 +43,9 @@ the user's repo via `--path`.
 ## Step 2: Format the Commit Message
 
 From the `userPrompts` array, pick **2-3 key conversation lines** that reveal the
-decision-making — direction changes, pivots, root causes. Summarize each in one line.
+decision-making — direction changes, pivots, root causes, conclusions. Apply the same
+**materiality test** as Step 3a: keep only what materially shaped context or results; skip
+exploratory chatter, tool-call notifications, and superseded back-and-forth. Summarize each in one line.
 
 ```
 <details>
@@ -74,9 +82,20 @@ verbatim (the prompt wording is the reusable know-how). Classify every turn:
 - **DROP** (whole turn, no masking, no summarizing) — personal, financial, credentials/secrets,
   security-incident, or off-topic.
 - **Unsure → DROP.** Over-removal is recoverable; a committed leak is not.
-- **Substance, not just topic** — even on-topic, drop turns with no decision or reusable rationale
-  (acknowledgments, corrections, "focus on X" redirections). The Recap narrates the flow; the log
-  keeps only substantive prompts.
+- **Materiality test — keep only what shaped context or results.** Even on-topic, keep a turn
+  only if it materially affected the work: a **decision, a pivot, a root cause, or a conclusion**
+  that the diff or the direction depended on. The log is the *distilled decision trail*, not a
+  raw transcript dump.
+- **Intent-for-the-next-worker test (primary lens, see "Why this skill exists").** For each
+  candidate turn ask: *"would a different worker, later, need this to understand WHY this change
+  was made and to continue safely without re-deriving it?"* Keep turns that capture **intent and
+  the reasoning that won** — especially *why this over the rejected alternative*, why a value/cap/
+  constraint was chosen or removed, and assumptions a successor must not silently violate. If a
+  successor could pick up the work cleanly without a turn, it is droppable trivia.
+- **DROP the trivia** (whole turn): exploratory chatter, tool-call notifications / status pings,
+  transient back-and-forth, acknowledgments, "focus on X" redirections, and **mid-way reversals
+  that were later superseded** (keep only the conclusion that won, not the abandoned detours).
+  The Recap narrates the flow; the log keeps only the substantive, still-standing decisions.
 - **Reactive turns**: a kept one emits its `precedingAssistant`/`options`/`decision`, so judge
   and scan the whole unit — a sensitive *suggestion* drops the turn even if the reply looks fine.
 
@@ -109,24 +128,37 @@ Keep the keep/drop ledger in your reasoning only — never write it into the fil
 
 The file rides in the SAME commit created by Step 4.
 
-## Step 4: Create the Commit
+## Step 4: Create the Commit(s) — atomic, one unit per commit
 
-1. Run `git status` and `git diff HEAD`
-2. Stage relevant files (prefer specific files over `git add -A`)
-3. **Pre-commit gate** — re-scan the assembled log (`docs/commit-log/$TS-$slug.md`) with the
+1. Run `git status` and `git diff HEAD`.
+2. **Group the changes by logical unit** — feature vs docs vs fix vs config vs refactor.
+   Each cohesive change is its own commit; do **not** dump everything into one giant commit.
+   The directive-log (`docs/commit-log/$TS-$slug.md` + README row) rides with the unit it
+   documents — usually the primary change unit.
+3. **Stage by filename, per unit** — `git add <file> <file>…` for that unit only.
+   **Never `git add .` / `git add -A`** (stage by name; secrets like `.env`/credentials never staged).
+4. **Pre-commit gate** — re-scan the assembled log (`docs/commit-log/$TS-$slug.md`) with the
    Step 3a regex. On any match, **STOP — do not commit**; report the line and remove it first.
-4. Commit with HEREDOC:
+5. **Hunk-split limitation** — if core files interleave two concerns at the **line level**
+   (the same file's hunks can't be cleanly separated by filename), do **not** force a broken
+   split. State the limitation explicitly and fall back to a sensible smaller number of commits
+   (e.g., 2) that still keep each commit coherent — and note this in the Recap.
+6. Commit each unit with a focused WHY-centric message via HEREDOC. Repeat per unit:
 
 ```bash
 git commit -m "$(cat <<'EOF'
-<concise commit title>
+<concise commit title for THIS unit>
 
-<recap block from Step 2>
+<short WHY — 1-2 sentences; recap block from Step 2 on the unit that carries the log>
+
+🤖 Co-Authored-By: Claude <noreply@anthropic.com>
 EOF
 )"
 ```
 
-Do not stage secrets (.env, credentials). Do not create empty commits.
+Do not stage secrets (.env, credentials). Do not create empty commits. Do not use
+`--no-verify`. Order commits so dependencies land first (e.g., config/fix before the feature
+that relies on them).
 
 ## Backfill mode (document past commits)
 
