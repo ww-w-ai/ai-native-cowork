@@ -8,3 +8,4 @@
 | 2026-05-28 13:39:18 | fix(readme): update stale www-commit reference in architecture section | [fix-readme-stale-ref](./20260528-133918-fix-readme-stale-ref.md) |
 | 2026-05-28 16:54:56 | refactor: streamline cowork-commit skill + fix symlink session discovery | [skill-refactor-and-symlink-fix](./20260528-165456-skill-refactor-and-symlink-fix.md) |
 | 2026-05-29 17:08:54 | feat(cowork-commit): scope-filter redaction for directive logs | [redaction-scope-filter](./20260529-170854-redaction-scope-filter.md) |
+| 2026-06-01 20:08:23 | feat(cowork-sprint): intent-audit gate + intent-auditor agent + agent discovery; englishize plugin | [cowork-sprint-intent-audit-and-discovery](./20260601-200823-cowork-sprint-intent-audit-and-discovery.md) |
