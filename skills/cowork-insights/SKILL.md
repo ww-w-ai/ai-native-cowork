@@ -21,7 +21,7 @@ Parse the user's request to determine these flags:
 | `--exclude-path` | folders to exclude (repeatable) | omit |
 | `--tz` | timezone if mentioned | `Asia/Seoul` |
 | `--format` | "full recap" → `full`, "quick" → `standard`, "minimal" / "standup" → `minimal`. Auto: 20+ sessions → `full`, 1-19 → `standard` | auto |
-| `--language` | match conversation language or explicit request | `한국어` |
+| `--language` | match conversation language or explicit request | `ko` |
 | `--output` | output path base | omit (auto) |
 
 ## Step 2: Run the Generator

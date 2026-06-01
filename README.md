@@ -69,7 +69,7 @@ git clone https://github.com/ww-w-ai/ai-native-cowork.git
 /cowork-insights --from 1w                          # Last 7 days (exact 168h)
 /cowork-insights --from 2026-04-01 --to 2026-04-07  # Date range
 /cowork-insights --from 1m --scope all              # Last month, every project
-/cowork-insights 최근 1주일, 전체 프로젝트, 한국어로   # Natural language, any language
+/cowork-insights last week, all projects, in plain English  # Natural language, any language
 /cowork-commit                             # Recap + directive log in your next commit
 /cowork-commit --language ko               # Recap in Korean (default: conversation language)
 /cowork-commit backfill                    # Document past commits retroactively
@@ -152,8 +152,8 @@ When everyone runs `/cowork-insights --from 1w` and shares the Markdown:
 
 Claude Code encodes project paths by replacing non-alphanumeric characters with `-`, so two
 non-ASCII folder names of the same length can collide into one hash and mix sessions. CC core
-issue [anthropics/claude-code#19972]. Workaround: use distinct ASCII prefixes
-(`work-업무자료`, `personal-개인사진`).
+issue [anthropics/claude-code#19972]. Workaround: prefix non-ASCII folder names with
+distinct ASCII tokens (e.g. `work-`, `personal-`).
 
 ## License
 
