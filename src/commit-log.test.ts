@@ -1,6 +1,6 @@
 import { test, expect } from 'bun:test'
 import {
-  messageText, findAskUserQuestion, isAck, truncate, parseDecision, inWindow,
+  messageText, findAskUserQuestion, truncate, parseDecision, inWindow,
   isSynthetic, stripSystemTags, buildTurns, type RawMessage,
 } from './commit-log.js'
 
@@ -33,13 +33,6 @@ test('findAskUserQuestion: extracts option labels', () => {
 
 test('findAskUserQuestion: null when absent', () => {
   expect(findAskUserQuestion({ type: 'assistant', message: { content: 'hi' } })).toBeNull()
-})
-
-test('isAck: acks vs real directives', () => {
-  expect(isAck('ok')).toBe(true)
-  expect(isAck('진행')).toBe(true)
-  expect(isAck('실행')).toBe(false)
-  expect(isAck('use TypeScript instead')).toBe(false)
 })
 
 test('truncate: keeps short, marks long', () => {
@@ -83,16 +76,17 @@ function a(line: number, ts: string, text: string): RawMessage {
   return { msg: { type: 'assistant', timestamp: ts, message: { content: text } }, line }
 }
 
-test('buildTurns: keeps real directives, drops standalone ack without preceding assistant', () => {
+test('buildTurns: extracts ALL turns mechanically (ack/materiality filtering is the LLM job in SKILL Step 3a, language-agnostic)', () => {
   const raw = [
     u(1, '2026-05-27T01:00:00Z', 'use TypeScript instead'),
-    u(2, '2026-05-27T01:01:00Z', 'ok'),  // no preceding assistant → standalone ack → dropped
+    u(2, '2026-05-27T01:01:00Z', 'ok'),  // standalone ack — engine keeps it; the LLM drops it in Step 3a
   ]
   const turns = buildTurns(raw, 'sess1234')
-  expect(turns.length).toBe(1)
+  expect(turns.length).toBe(2)
   expect(turns[0]!.userText).toBe('use TypeScript instead')
   expect(turns[0]!.line).toBe(1)
-  expect(turns[0]!.sessionId).toBe('sess1234')
+  expect(turns[1]!.userText).toBe('ok')
+  expect(turns[1]!.sessionId).toBe('sess1234')
 })
 
 test('buildTurns: keeps ack that responds to an assistant proposal', () => {

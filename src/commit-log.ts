@@ -18,8 +18,6 @@ export type RawMessage = { msg: SessionMessage; line: number }
 export const MAX_USER = 3000
 export const MAX_ASSISTANT = 800
 
-const ACK_RE = /^(ok|okay|go|y|yes|yep|sure|continue|네|응|ㅇㅇ|그래|진행|좋아)\.?\s*$/i
-
 export function messageText(m?: SessionMessage): string {
   if (!m?.message) return ''
   const c = m.message.content
@@ -43,10 +41,6 @@ export function findAskUserQuestion(m?: SessionMessage): { options: string[] } |
     }
   }
   return null
-}
-
-export function isAck(text: string): boolean {
-  return ACK_RE.test(text.trim())
 }
 
 export function truncate(text: string, max: number): string {
@@ -116,9 +110,6 @@ export function buildTurns(
 
     const decision = parseDecision(userText)
     const isReactive = Boolean(options) || Boolean(decision) || userText.length < 60
-
-    // CRITICAL (Gotcha #12): use !precedingAssistant, NOT !isReactive
-    if (isAck(userText) && !precedingAssistant) continue
 
     turns.push({
       ts,
