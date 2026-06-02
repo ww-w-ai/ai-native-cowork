@@ -51,7 +51,16 @@ just the literal plan) and grows the rest alongside you.
 
 **Via ww-w-ai marketplace (recommended):**
 
-Add the ww-w-ai marketplace to your Claude Code settings, then enable the plugin:
+Run these two slash commands in Claude Code — one after the other:
+
+```
+/plugin marketplace add ww-w-ai/marketplace
+/plugin install ai-native-cowork@ww-w-ai
+```
+
+That's it. (`@ww-w-ai` disambiguates if you have multiple marketplaces; `/plugin install ai-native-cowork` alone works too.)
+
+**Or via settings.json:**
 
 ```jsonc
 // ~/.claude/settings.json
@@ -69,13 +78,23 @@ Add the ww-w-ai marketplace to your Claude Code settings, then enable the plugin
 
 Restart Claude Code — the plugin downloads automatically.
 
-**Manual install:**
+**Local checkout (development):**
+
+This repo is a plugin, not a marketplace, so install it through the local
+marketplace clone:
 
 ```bash
-git clone https://github.com/ww-w-ai/ai-native-cowork.git
-# Add to settings.json:
-# "ai-native-cowork@local:/path/to/ai-native-cowork": true
+git clone https://github.com/ww-w-ai/marketplace.git
 ```
+
+```
+/plugin marketplace add /absolute/path/to/marketplace
+/plugin install ai-native-cowork
+```
+
+To hack on the plugin itself, point the marketplace clone's `ai-native-cowork`
+entry at your local checkout, or symlink `skills/` and `agents/` into
+`~/.claude/`.
 
 **Requirements:** [Claude Code](https://claude.ai/claude-code) v2.1.71+ · [Bun](https://bun.sh) (TypeScript engine).
 

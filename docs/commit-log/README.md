@@ -10,3 +10,4 @@
 | 2026-05-29 17:08:54 | feat(cowork-commit): scope-filter redaction for directive logs | [redaction-scope-filter](./20260529-170854-redaction-scope-filter.md) |
 | 2026-06-01 20:08:23 | feat(cowork-sprint): intent-audit gate + intent-auditor agent + agent discovery; englishize plugin | [cowork-sprint-intent-audit-and-discovery](./20260601-200823-cowork-sprint-intent-audit-and-discovery.md) |
 | 2026-06-02 12:39:15 | feat: make cowork-sprint model-invocable (remove disable-model-invocation) | [enable-sprint-model-invocation](./20260602-123915-enable-sprint-model-invocation.md) |
+| 2026-06-02 14:23:52 | docs(readme): fix install guide — lead with /plugin commands, drop invalid local syntax | [fix-readme-install-guide](./20260602-142352-fix-readme-install-guide.md) |
