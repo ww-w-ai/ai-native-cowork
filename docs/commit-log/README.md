@@ -9,3 +9,4 @@
 | 2026-05-28 16:54:56 | refactor: streamline cowork-commit skill + fix symlink session discovery | [skill-refactor-and-symlink-fix](./20260528-165456-skill-refactor-and-symlink-fix.md) |
 | 2026-05-29 17:08:54 | feat(cowork-commit): scope-filter redaction for directive logs | [redaction-scope-filter](./20260529-170854-redaction-scope-filter.md) |
 | 2026-06-01 20:08:23 | feat(cowork-sprint): intent-audit gate + intent-auditor agent + agent discovery; englishize plugin | [cowork-sprint-intent-audit-and-discovery](./20260601-200823-cowork-sprint-intent-audit-and-discovery.md) |
+| 2026-06-02 12:39:15 | feat: make cowork-sprint model-invocable (remove disable-model-invocation) | [enable-sprint-model-invocation](./20260602-123915-enable-sprint-model-invocation.md) |

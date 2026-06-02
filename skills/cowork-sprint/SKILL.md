@@ -10,7 +10,6 @@ triggers:
   - run sprints
   - plan and execute
 argument-hint: "[goal / feature set / plan-file(s)]  [--auto-plan]"
-disable-model-invocation: true
 allowed-tools:
   - Read
   - Write
