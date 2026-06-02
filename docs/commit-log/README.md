@@ -11,3 +11,5 @@
 | 2026-06-01 20:08:23 | feat(cowork-sprint): intent-audit gate + intent-auditor agent + agent discovery; englishize plugin | [cowork-sprint-intent-audit-and-discovery](./20260601-200823-cowork-sprint-intent-audit-and-discovery.md) |
 | 2026-06-02 12:39:15 | feat: make cowork-sprint model-invocable (remove disable-model-invocation) | [enable-sprint-model-invocation](./20260602-123915-enable-sprint-model-invocation.md) |
 | 2026-06-02 14:23:52 | docs(readme): fix install guide — lead with /plugin commands, drop invalid local syntax | [fix-readme-install-guide](./20260602-142352-fix-readme-install-guide.md) |
+| 2026-06-02 16:04:48 | feat(cowork-insights): auto-generate facets before render + facet-extractor agent + language auto-detect | [cowork-insights-facet-automation](./20260602-160448-cowork-insights-facet-automation.md) |
+| 2026-06-02 16:04:49 | feat(cowork-sprint): agent self-evolution loop + ≤1500-word prompt cap | [cowork-sprint-agent-self-evolution](./20260602-160449-cowork-sprint-agent-self-evolution.md) |
