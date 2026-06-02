@@ -19,7 +19,7 @@ import { analyzeGitHistory } from './git-analyzer.js'
 import { parseDateArg, getSystemTimezone, getClaudeHome, scanSessionFiles, formatTranscript, type ScanScope } from './session-scanner.js'
 import { readRawMessages, buildTurns } from './commit-log.js'
 import { generateFullReport, generateMarkdownReport, NARRATIVE_SCHEMA_DESCRIPTION, type NarrativeData, type ScanData } from './html-report.js'
-import { loadCachedFacets, type SessionFacet } from './facet-cache.js'
+import { loadCachedFacets, loadCachedFacet, type SessionFacet } from './facet-cache.js'
 import { execFileSync, execSync } from 'child_process'
 import { mkdir, writeFile, readFile } from 'fs/promises'
 import { join } from 'path'
@@ -485,6 +485,47 @@ async function main() {
       console.log(JSON.stringify({
         lastCommit: lastCommitISO,
         ...formatSessionData(data, getSystemTimezone()),
+      }, null, 2))
+      break
+    }
+
+    case 'list-uncached': {
+      // List the sessions the report will ACTUALLY analyze that have NO cached
+      // facet yet, with their JSONL paths — so the skill can dispatch the
+      // facet-extractor agent per session (deterministic: the skill never
+      // recomputes the project hash itself).
+      //
+      // Uses runRecapPipeline (NOT raw scanSessionFiles) so the set matches the
+      // report's analyzed sessions after branch-dedup + empty-session filtering.
+      // Subagent sessions (id starts with "agent-") are skipped: low signal for
+      // qualitative facet analysis.
+      const { from, to, scope, path, paths, excludePaths, tz, includeSubagents } = parseCliArgs()
+      const dateRange = from || to ? { from, to } : undefined
+      const data = await runRecapPipeline(dateRange, scope, path, tz, includeSubagents, paths, excludePaths)
+
+      // sessionId -> JSONL path map (from the same file scan the pipeline used)
+      const files = await scanSessionFiles({ dateRange, scope, basePath: path, tz, includeSubagents, paths, excludePaths })
+      const pathById = new Map(files.map(f => [f.sessionId, f.path]))
+
+      const uncached: Array<{ sessionId: string; path: string }> = []
+      let subagentsSkipped = 0
+      let pathMissing = 0
+      for (const sid of data.uncachedSessionIds) {
+        if (sid.startsWith('agent-')) { subagentsSkipped++; continue }
+        const p = pathById.get(sid)
+        if (!p) { pathMissing++; continue }
+        uncached.push({ sessionId: sid, path: p })
+      }
+
+      const facetsDir = join(getClaudeHome(), 'recap-data', 'facets')
+      console.log(JSON.stringify({
+        facetsDir,
+        analyzed: data.sessionMetrics.length,
+        cached: data.sessionMetrics.length - data.uncachedSessionIds.length,
+        subagentsSkipped,
+        pathMissing,
+        uncachedCount: uncached.length,
+        uncached,
       }, null, 2))
       break
     }
