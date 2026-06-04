@@ -3,6 +3,8 @@
 > Detail for `cowork-sprint`. The SKILL.md is the thin orchestrator; this file holds the
 > heuristics and the state schema. Self-contained — do not defer to global CLAUDE.md at runtime.
 
+> Contents: 1 Sizing · 2 Dependency & execution mode · 3 Planning dialogue · 4 Execution patterns · 5 Cycle & gates · 5b Exit predicate · 6 status.json schema · 7 Resume.
+
 ## 1. Sprint sizing (human-week unit)
 
 A sprint = roughly **one human-week of work for a normal (non-AI) team** — the *unit of planning*, not of wall-clock. AI executes far faster, but sizing in human terms keeps scope legible and the roadmap honest.
@@ -65,6 +67,10 @@ research → plan-detail → design → do → QA → fix → intent-audit → c
 
 - **commit** (per sprint, after its gate is green) is MANDATORY via `/cowork-commit` — never a bare `git commit` (it adds the WHY message + Co-Authored-By + AI directive-log + the mechanical-hygiene subset). Under the global git-safety gate (explicit user request; never push without it).
 - **doc-sync** runs ONCE after all sprints via `/cowork-doc-sync` — MANDATORY terminal step, not a "later" suggestion. Skipping it = the sprint is not done (docs left stale). Both are detailed in SKILL.md PHASE 1.
+
+**Phase gate (sequential enforcement).** Phase N-1 must be **complete — its observable exit condition met (sign-off / exit predicate green)** — before phase N starts. No skipping ahead on an unfinished phase; an unmet exit condition pauses, it does not pass silently.
+
+**Checklist → TodoWrite (mandatory).** Each cycle-phase checklist item becomes an actual `TodoWrite` item, not a passive prose list — no exceptions. Mark `in_progress` on entry, `completed` only when its exit condition is verified. This makes the phase gate above observable (a phase isn't "done" until its todos are all `completed`).
 
 Gates fire at **different phases** (catch drift early, not just at the end):
 - **Research sign-off** (before `plan-detail`): the facts THIS sprint depends on are gathered — codebase reality, external specs, constraints, prior art. Never enter `do` on assumptions (CLAUDE.md "Research-before-Do" — Research-less Do is an anti-pattern).

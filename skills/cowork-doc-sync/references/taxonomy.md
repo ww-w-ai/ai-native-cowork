@@ -14,7 +14,7 @@ Numbering applies **only to docs we authored.** Tool-generated artifacts (§4) a
 | `02-planned` | Plan/future (decided but not yet built) | ACTIVE-PLAN |
 | `03-manual` | User/technical manuals + handover | LIVING (synced) |
 | `04-legacy` | Superseded/deprecated docs (once authoritative) | FROZEN |
-| `05-reports` | Work snapshots: PDCA, gap analysis, code review, session reports. Immutable, by date | FROZEN-by-nature |
+| `05-reports` | Work snapshots: PDCA, gap analysis, code review, code-health observations, session reports. Immutable, by date | FROZEN-by-nature |
 | `06-research` | Technical/domain research = decision evidence (CF/library/platform investigation). By date | FROZEN-by-nature |
 | `99-misc` | Unclassified catch-all inbox (temporary, hard to classify) | temporary |
 

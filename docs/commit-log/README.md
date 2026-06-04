@@ -14,3 +14,4 @@
 | 2026-06-02 16:04:48 | feat(cowork-insights): auto-generate facets before render + facet-extractor agent + language auto-detect | [cowork-insights-facet-automation](./20260602-160448-cowork-insights-facet-automation.md) |
 | 2026-06-02 16:04:49 | feat(cowork-sprint): agent self-evolution loop + ≤1500-word prompt cap | [cowork-sprint-agent-self-evolution](./20260602-160449-cowork-sprint-agent-self-evolution.md) |
 | 2026-06-02 17:07:46 | feat(cowork-sprint): force commit + doc-sync as mandatory cycle steps | [cowork-sprint-force-commit-doc-sync](./20260602-170746-cowork-sprint-force-commit-doc-sync.md) |
+| 2026-06-04 15:48:22 | feat: trigger-fit skill descriptions + adopted authoring patterns (3-layer) — v1.10.0 | [authoring-patterns-and-trigger-fit-descriptions](./20260604-154822-authoring-patterns-and-trigger-fit-descriptions.md) |

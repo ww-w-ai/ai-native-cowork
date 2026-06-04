@@ -1,14 +1,7 @@
 ---
 name: cowork-sprint
 description: |
-  Plan-then-execute sprint orchestrator. Works like a real delivery team: split work into sprints (~1 human-week each), plan them all up front WITH the user, then autonomously run each sprint through a full cycle (research→plan→design→do→QA→fix→deploy) to completion.
-  Multiple sprints can run at once (concurrent dispatch). The leader (main session) dynamically scaffolds project-local agents for whatever domain — not dev-only (marketing, research, ops, data all fit).
-  bkit-aware: borrows bkit agents/skills internally when present, runs fully standalone otherwise. Not for single-file edits, one-shot bug fixes, or work under ~a few hours.
-triggers:
-  - cowork-sprint
-  - sprint plan
-  - run sprints
-  - plan and execute
+  Plan-then-execute sprint orchestrator for multi-part work spanning several areas with sequential dependencies. Trigger on sprint plan, run sprints, plan and execute, /cowork-sprint, or implicit cues like "break this into sprints", "plan it all up front then build the whole thing", or any multi-feature initiative sharing one scope/timeline. Works like a real delivery team: ~1-human-week sprints, concurrent dispatch, leader (main session) dynamically scaffolds project-local agents for ANY domain (dev, marketing, research, ops, data). bkit-aware: borrows bkit agents/skills when present, fully standalone otherwise. DO NOT use for single-file edits, one-shot bug fixes, work under ~a few hours, or a single-feature plan (use plain PDCA instead).
 argument-hint: "[goal / feature set / plan-file(s)]  [--auto-plan]"
 allowed-tools:
   - Read
@@ -20,6 +13,7 @@ allowed-tools:
   - Agent      # dispatch project-local / bkit agents (delegate pattern)
   - Workflow   # deterministic fan-out (direct-execution pattern)
   - Skill      # /simplify, /cowork-doc-sync, bkit skills when present
+  - TodoWrite  # phase checklists become tracked todos (mandatory, not passive lists)
   - WebSearch
   - WebFetch
 effort: max
@@ -98,7 +92,12 @@ Main Session = cowork-sprint Leader
 
 ## Dynamic local agents (general team-building)
 
-The Leader assembles a team fit for the project's domain — **reuse before rebuild**, scaffold only the gaps:
+The Leader assembles a team fit for the project's domain — **reuse before rebuild**, scaffold only the gaps. Create-vs-reuse gate (prevents agent sprawl):
+- **Create a new agent when** the role is missing from all discovery sources AND is a distinct, recurring responsibility this sprint actually needs.
+- **Reuse existing (bkit / user-global / a prior scaffold) when** a discovered agent fits the role — even approximately; refine via the evolution loop rather than re-create.
+- **Don't create for** a one-off step the Leader can do inline, a near-duplicate of an existing agent, or a role used only once with no reuse.
+
+Scaffold only after this gate says "create":
 
 ```
 For each needed role:
@@ -117,6 +116,7 @@ Then EVOLVE them from their output (loop below) — a scaffold is a first draft,
 ```
 
 - **How to write a strong agent** (frontmatter, description-triggers, system-prompt structure, length, tool scoping) → **`references/agent-authoring.md`** (synthesized from official docs + 36k/21k/12k★ collections). Read it before scaffolding.
+- **How to write a strong skill** — when a role needs a **reusable capability or heavy domain knowledge** (not a one-shot role), scaffold a project-local skill (`.claude/skills/<name>/SKILL.md`) instead of bloating an agent body, and reference it via the agent's `skills:` field (which only references — it never auto-creates). → **`references/skill-authoring.md`** (CC official: <500 lines, description=triggers-only, progressive disclosure).
 - **Agents self-evolve from their output (bounded).** After an owned scaffolded agent runs, judge its output against the signals you already have (exit-predicate, QA, intent-audit) and, **only when the gap is a DEFINITION defect** (would recur — vague role, missing constraint, loose output-format, over-broad scope), rewrite its `.md` to fix exactly that. Stay under the **1500-word cap by compaction, never accretion**; if a role keeps failing, **split it** rather than inflate it. Max **2** evolution rounds/agent/sprint, then auto-pause `AGENT_EVOLUTION_EXHAUSTED`. Owned = cowork-sprint's own project-local scaffolds **only** — never rewrite borrowed plugin/user-global or the fixed shipped agents (`cowork-intent-auditor`, `cowork-facet-extractor`). Full loop (evaluate→diagnose→refine→re-dispatch→record) → **`references/agent-authoring.md` § Self-evolution**.
 - **Discovery is plugin-agnostic.** bkit, when present, is just one source in the pool above (its cto-lead team, gap-detector, qa agents) — reuse it like any other; bkit absent changes nothing about the discovery order. The Leader stays in main either way.
 - **This plugin ships one fixed agent — `cowork-intent-auditor`** (domain-agnostic Tier-2 intent audit, used by the intent-audit gate), found by the same discovery. Principle: **generic meta-roles ship fixed; domain-specific execution roles are scaffolded.**
@@ -126,6 +126,9 @@ Then EVOLVE them from their output (loop below) — a scaffold is a first draft,
 ```
 Leader runs the approved roadmap. For each sprint (sequential clusters one by one;
 independent clusters dispatched concurrently):
+
+  Phase gate: each phase's checklist → actual TodoWrite items (mandatory, not a passive list);
+  phase N-1 must be complete (its exit condition met) before phase N starts. → references/sprint-method.md §5
 
   CYCLE per sprint:
     research → plan-detail → design → do → QA → fix → intent-audit → commit → deploy/deliver

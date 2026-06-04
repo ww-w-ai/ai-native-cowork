@@ -1,6 +1,6 @@
 ---
 name: cowork-doc-sync
-description: "Ongoing doc-sync skill that aligns a project's docs/ with the current code/decision state. Call once at the very end, after implementation/refactoring is complete. Enforces a numbered taxonomy (00-reference~99-misc) + status model (LIVING/ACTIVE/FROZEN) + migration rules. To fit an existing project into this structure for the first time, use /cowork-doc-init. Triggers: cowork-doc-sync, /cowork-doc-sync, sync docs, align docs, organize docs, doc sync, doc alignment"
+description: "Aligns a project's docs/ with the current code/decision state — call once at the very end, after implementation or refactoring is complete. Trigger on sync docs, align docs, organize docs, doc sync, /cowork-doc-sync, or implicit cues like \"clean up the docs now that we're done\", \"docs are out of sync with the code\", \"update docs to match what we built\". Enforces a numbered taxonomy (00-reference~99-misc) + status model (LIVING/ACTIVE/FROZEN) + migration rules; replays decisions since the last sync marker + git diff. DO NOT use to first-time bootstrap an unstructured docs/ (use /cowork-doc-init), to write one standalone doc, or piecemeal mid-implementation (run only after work is complete)."
 ---
 
 # /cowork-doc-sync — Ongoing Doc Sync
@@ -12,6 +12,7 @@ Call at the **very end**, once implementation/refactoring/decisions are done. Al
 - Built-complete ACTIVE-PLAN → fold into LIVING, then FROZEN
 - Superseded docs → move to `04-legacy` (+tombstone)
 - New reports/research → file by date in `05-reports`/`06-research`
+- Surface code-health observations that emerge while reconciling docs↔source — as a human writing docs naturally spots code deficiencies. By-product of work already done, not a separate audit → lightweight advisory report
 
 **Anti-pattern (the reason this skill exists)**: piecemeal doc edits during multi-step implementation = wasted churn from reversals. Implementation done → verify → **cowork-doc-sync in one pass**.
 
@@ -44,7 +45,9 @@ Decisions **span multiple sessions.** Looking at the current session only misses
 ```
 1. Scan: cross-check the conversation decisions + code drift collected in 0-c above against the current state of docs/.
 2. Detect drift — current code/decisions vs LIVING docs:
-   if (LIVING doc diverges from current) → update to current truth (reflect verbatim facts, no speculation).
+   if (LIVING doc diverges from code) → FIRST disambiguate which side is wrong (this is the human judgment):
+     · doc is stale, code is the intended truth → update doc to current (verbatim facts, no speculation).
+     · code betrays the doc/decision (a wrong fix / regression) → do NOT silently rewrite the doc to match the bad code; flag it in code-health (step 6).
    if (ACTIVE-PLAN is built-complete) → fold current truth into 01-built → move plan to 04-legacy (+tombstone).
    if (doc is superseded) → move to 04-legacy + tombstone header.
 3. Classify: file the artifacts this work produced into the taxonomy.
@@ -52,13 +55,23 @@ Decisions **span multiple sessions.** Looking at the current session only misses
    research results → 06-research/YYYYMMDD-*.md (but product/business research = vault, §5 boundary)
 4. Apply migration rules (taxonomy §3): move/delete/tombstone. Minimize strikethrough. git is the history.
 5. Maintain single LIVING authority: verify the "current truth = 01-built" invariant. Check status label headers.
-6. Report: summarize what was updated/moved/filed.
-7. Update marker: scripts/sync-state.sh set <docs_dir> (now + HEAD). → starting point for the next sync.
+6. Code-health observations (by-product of reconciliation — the USER's changed source):
+   only if code drift (0-c) has SOURCE changes; docs-only window → skip.
+   PRIMARY = step 2's "code betrays the doc/decision" cases (wrong fixes) — flag first, cite both sides.
+   SECONDARY = structural: weak/inflexible architecture, duplication/low reuse, clean-arch opportunities (layer leaks, coupling).
+   high-confidence + evidence-based, lightweight. → file 05-reports/YYYYMMDD-code-health.md (format below); else one line "none".
+7. Report: summarize what was updated/moved/filed + the code-health headline (N findings / none).
+8. Update marker: scripts/sync-state.sh set <docs_dir> (now + HEAD). → starting point for the next sync.
 ```
+
+## Code-health report — format
+
+`05-reports/YYYYMMDD-code-health.md`. FROZEN, advisory, no fixes. Table: `Severity | Type (doc-mismatch/bug/architecture/reuse/clean-arch) | Code file:line | Says-vs-does`. Lead with doc-mismatch rows. file:line evidence only, no speculation. (e.g. "design.md says retry once; api-client.ts:42 retries forever".)
 
 ## Boundaries / Safety
 
 - **Do not fill LIVING docs with speculation** — only facts confirmed from code/decisions. If unknown, confirm with the user.
+- **Code-health report is advisory, not blocking** — never auto-fix, never let it slow the doc-alignment primary job. Same evidence discipline as docs (file:line, no speculation). Lightweight observation pass, not a full audit.
 - Tool-generated artifacts (commit-log, bkit/*) are not absorbed into the taxonomy (taxonomy §4).
 - git is the safety net for moves/deletes — but if it feels irreversible, confirm with the user.
 - If a new folder scaffold is needed, use `scripts/init-doc-tree.sh <docs_dir>`.

@@ -7,7 +7,8 @@ name: {{AGENT_NAME}}
 #   - Lead with what it is expert at, then concrete when-to-use triggers.
 #   - Add "Use PROACTIVELY for ..." / "Use immediately after ..." ONLY to make it
 #     auto-fire without being asked. Omit for explicit-only agents.
-#   - Optional: 2-4 <example> blocks sharpen triggering (contains-studio pattern):
+#   - Recommended for AUTO-firing agents (omit for explicit-only): 2-4 <example> blocks
+#     sharpen triggering and combat undertriggering (contains-studio pattern):
 #       <example>Context: {{SITUATION}}
 #       user: "{{USER_REQUEST}}"
 #       assistant: "{{HOW_THIS_AGENT_HELPS}}"
@@ -34,6 +35,9 @@ model: {{haiku|sonnet|opus|inherit}}
 <!-- HARD CAP: keep this body (everything below) ≤ 1500 words. On later refinement, COMPACT existing
      lines to make room — never just append. If you can't fit the real responsibilities under the cap,
      SPLIT into two focused agents. Check: awk 'f{print} /^---$/{c++} c==2{f=1}' <file> | wc -w -->
+
+<!-- OPTIONAL: distill the core discipline into a one-line bold maxim up top
+     (e.g. **NO FIX WITHOUT ROOT CAUSE FIRST**) — one line carries the agent's reason-for-being. -->
 
 You are {{ROLE}}, specializing in {{DOMAIN_EXPERTISE}}.
 
@@ -74,3 +78,6 @@ Return:
 - {{CONSTRAINT_1 — e.g. report only, do not modify files}}
 - {{CONSTRAINT_2 — stay in scope; defer unrelated work}}
 - {{GUIDING_PRINCIPLE — e.g. fix root causes, not symptoms}}
+<!-- REVIEW/JUDGE agents only — two noise controls: -->
+<!-- - Confidence threshold: report only findings held at ≥N confidence (e.g. ≥80/100); else omit. -->
+<!-- - Do NOT report: subjective style/naming nits, one-off non-systemic issues, anything a linter catches, or anything outside the stated scope. -->

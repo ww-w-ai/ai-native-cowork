@@ -1,6 +1,6 @@
 ---
 name: cowork-doc-init
-description: "One-time bootstrap of an existing project's docs/ and source into the cowork-doc-sync taxonomy structure. After a detailed gap analysis, relocate docs to match the standard. Phase 1 = relocation only (no new creation, includes moving content between docs), Phase 2 = analyze source to create new docs (only after user approval). For ongoing maintenance use /cowork-doc-sync. Triggers: cowork-doc-init, /cowork-doc-init, init doc structure, relocate docs, organize existing docs, doc init, doc bootstrap"
+description: "One-time bootstrap of an existing project's docs/ into the cowork-doc-sync taxonomy. Trigger on init doc structure, relocate docs, organize existing docs, doc bootstrap, /cowork-doc-init, or implicit cues like \"my docs/ is a mess, set up a structure\", \"fit this project into the doc standard\". After a gap analysis: Phase 1 = relocation only (move existing docs/sections, no new creation), Phase 2 = analyze source to create new docs (only after user approval). DO NOT use for ongoing maintenance of an already-structured docs/ (use /cowork-doc-sync) — this is first-time setup only."
 ---
 
 # /cowork-doc-init — Bootstrap existing docs/source into the cowork-doc-sync structure (one-time)

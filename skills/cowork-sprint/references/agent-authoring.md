@@ -5,6 +5,8 @@
 > collections (verified star counts, 2026-06). Domain-agnostic: the same skeleton works
 > for dev, marketing, research, ops, data, design.
 
+> Contents: Sources · Where agents live · Frontmatter · `description` field · System-prompt body · Tool scoping · Length & focus (HARD CAP) · Self-evolution · Model selection · Quick checklist.
+
 ## Sources (authority order)
 
 1. **Official** — Create custom subagents: https://code.claude.com/docs/en/sub-agents (authoritative; verify here first).
@@ -43,6 +45,7 @@ This is the single field Claude reads to decide whether to delegate. Get it righ
   - ✅ `"Expert code review specialist. Use immediately after writing or modifying code."`
   - ❌ `"Reviews code."` (no trigger → won't fire reliably)
 - **Proactive firing**: add `"Use PROACTIVELY for ..."` / `"Use immediately after ..."` ONLY when you want it to auto-fire without being asked. Omit for explicit-only agents.
+- **Write for triggering, not explanation; combat undertriggering.** The description decides delegation — make it slightly pushy so it fires when it should (`"Use whenever ... even if not explicitly asked"`), not a passive blurb. Concise but **trigger-complete** > raw brevity. No hard cap (CC warns >5000 chars; 1024 is a *skill*-only rule) — don't pad.
 - **Sharpen with `<example>` blocks** (contains-studio pattern) for ambiguous triggers:
   ```
   <example>Context: user just finished a feature.
@@ -63,6 +66,14 @@ The official examples and the top collections converge on:
 6. **Output format** — explicit: *the parent only sees the returned summary*, so specify exactly what to return (priority buckets, required fields, file paths).
 7. **Constraints / anti-patterns** — what NOT to do; reinforce least privilege.
 
+**Review/judge agents — two noise controls (both required):**
+- **Confidence/severity threshold** — report only findings held at ≥N confidence (e.g. ≥80/100); below that, omit. Uncertain findings waste the caller's loop more than they help.
+- **Explicit "Do NOT report" list** — subjective style/naming preferences, one-off non-systemic nits, anything a linter catches, and issues outside the stated scope. Name the exclusions so the agent doesn't pad to look thorough.
+
+**Distill the core discipline into a one-line maxim** — a memorable imperative the agent (and reader) can't miss, placed up top, bold (e.g. *"NO FIX WITHOUT ROOT CAUSE FIRST"*, *"EVIDENCE BEFORE ASSERTION"*). One line carries the agent's whole reason-for-being.
+
+**Generative / dynamically-scaffolded agents — create-vs-reuse gate.** When an agent (or the Leader) can spawn more agents, give it an explicit gate to prevent sprawl: *Create when* the role is missing AND a distinct recurring need; *Reuse when* a discovered agent fits (even approximately — refine via evolution); *Don't create for* a one-off inline step or a near-duplicate.
+
 ## Tool scoping by role (least privilege)
 
 - read-only / review / analysis → `Read, Grep, Glob`
@@ -70,11 +81,13 @@ The official examples and the top collections converge on:
 - editor / builder / fixer → `Read, Write, Edit, Bash, Glob, Grep`
 - Omit `tools` entirely **only** when the agent genuinely needs everything (rare — do it intentionally).
 
-## Length & focus  (HARD CAP — mechanically enforced)
+## Length & focus  (HARD CAP — our convention, mechanically enforced)
 
-- Simple agents: stay near the official **~150-250 words** (role → when-invoked → checklist → output → principle). Works great.
+> Provenance: official CC subagent docs give **no agent-size number** (only `name`+`description` required; body = the system prompt). The numbers below are **cowork-sprint's own convention**, adapted from the official *skill* guidance (metadata ~100 words; "every line is recurring token cost") applied one level up. Don't cite them as official.
+
+- Simple agents: **~150-250 words** is plenty (role → when-invoked → checklist → output → principle). Works great.
 - Deep experts: 500-1400 words is fine **if every line earns it**. Rule: *as long as needed to be unambiguous, no longer.*
-- **HARD CAP: the system-prompt body (everything after the closing frontmatter `---`) must be ≤ 1500 words.** Check it mechanically before saving and after every evolution:
+- **HARD CAP (our rule): the system-prompt body (everything after the closing frontmatter `---`) must be ≤ 1500 words.** Check it mechanically before saving and after every evolution:
   ```bash
   # body = lines after the 2nd '---'; fail if > 1500 words
   awk 'f{print} /^---$/{c++} c==2{f=1}' .claude/agents/<role>.md | wc -w
@@ -127,7 +140,8 @@ Per owned agent, max 2 evolution rounds per sprint (EVOLVE_CAP). Then escalate, 
 ## Quick checklist before saving a scaffolded agent
 
 - [ ] `name` kebab-case + unique
-- [ ] `description` leads with specialty + concrete triggers (+ proactive cue iff wanted)
+- [ ] `description` = specialty + concrete **triggers only** (+ proactive cue iff wanted). No workflow/step summary — it makes the model follow the description and skip the body (tested anti-pattern).
+- [ ] review/judge agents: a **confidence/severity threshold** ("report only ≥N") to cut noise
 - [ ] `tools` least-privilege (or intentionally omitted)
 - [ ] `model` chosen by task weight
 - [ ] body has role → when-invoked → responsibilities → output-format → constraints

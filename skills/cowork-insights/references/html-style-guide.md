@@ -2,6 +2,8 @@
 
 When generating the HTML recap report, follow this CSS/HTML reference for consistent, polished output.
 
+> Contents: Base Setup · Core CSS · Navigation TOC · Stats Row · At a Glance · Project Area Cards · Narrative · Big Wins/Friction · CLAUDE.md Suggestions · Feature/Pattern/Horizon Cards · Copyable Blocks · Team Feedback · Charts · Fun Ending · Responsive · JavaScript · Chart Colors · Timezone · Response Histogram · Section Order.
+
 ## Base Setup
 
 ```html
