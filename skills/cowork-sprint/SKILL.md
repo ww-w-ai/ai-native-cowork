@@ -1,7 +1,7 @@
 ---
 name: cowork-sprint
 description: |
-  Plan-then-execute sprint orchestrator for multi-part work spanning several areas with sequential dependencies. Trigger on sprint plan, run sprints, plan and execute, /cowork-sprint, or implicit cues like "break this into sprints", "plan it all up front then build the whole thing", or any multi-feature initiative sharing one scope/timeline. Works like a real delivery team: ~1-human-week sprints, concurrent dispatch, leader (main session) dynamically scaffolds project-local agents for ANY domain (dev, marketing, research, ops, data). bkit-aware: borrows bkit agents/skills when present, fully standalone otherwise. DO NOT use for single-file edits, one-shot bug fixes, work under ~a few hours, or a single-feature plan (use plain PDCA instead).
+  Plan-then-execute sprint orchestrator for multi-part work spanning several areas with sequential dependencies. Trigger on sprint plan, run sprints, plan and execute, /cowork-sprint, or implicit cues like "break this into sprints", "plan it all up front then build the whole thing", or any multi-feature initiative sharing one scope/timeline. Works like a real delivery team: ~1-human-week sprints, concurrent dispatch, leader (main session) dynamically scaffolds project-local agents for ANY domain (dev, marketing, research, ops, data). DO NOT use for single-file edits, one-shot bug fixes, work under ~a few hours, or a single-feature plan (use plain PDCA instead).
 argument-hint: "[goal / feature set / plan-file(s)]  [--auto-plan]"
 allowed-tools:
   - Read
@@ -10,9 +10,9 @@ allowed-tools:
   - Grep
   - Glob
   - Bash       # build, test, git, scaffold agent files
-  - Agent      # dispatch project-local / bkit agents (delegate pattern)
+  - Agent      # dispatch project-local / plugin agents (delegate pattern)
   - Workflow   # deterministic fan-out (direct-execution pattern)
-  - Skill      # /simplify, /cowork-doc-sync, bkit skills when present
+  - Skill      # /simplify, /cowork-doc-sync, /pdca-wf
   - TodoWrite  # phase checklists become tracked todos (mandatory, not passive lists)
   - WebSearch
   - WebFetch
@@ -82,6 +82,10 @@ Main Session = cowork-sprint Leader
    - Scaffold project-local agents for missing roles  →  see "Dynamic agents" below.
 4. Write a plan per sprint (goal, deliverables, cycle outline, deps, role assignments)
    into docs/  (repo) — these are the durable single input to PHASE 1.
+   For every feature chunk that PHASE 1 will execute via /pdca-wf: ALSO converge its
+   per-feature design doc + WorkList HERE (pdca-wf Phases 1-3 equivalent), so PHASE 1
+   invokes pdca-wf in execution-only mode (design doc in → Phase 4 直行). Planning is
+   interactive; deferring it into PHASE 1 would pause the autonomous run per feature.
 5. Initialize .ww-w-ai/cowork-sprint/status.json  (schema → references/sprint-method.md).
 6. ★ APPROVAL GATE: present the roadmap (sprints, order, parallelism, agents) and get
    the user's go. Do NOT start execution before approval.
@@ -94,7 +98,7 @@ Main Session = cowork-sprint Leader
 
 The Leader assembles a team fit for the project's domain — **reuse before rebuild**, scaffold only the gaps. Create-vs-reuse gate (prevents agent sprawl):
 - **Create a new agent when** the role is missing from all discovery sources AND is a distinct, recurring responsibility this sprint actually needs.
-- **Reuse existing (bkit / user-global / a prior scaffold) when** a discovered agent fits the role — even approximately; refine via the evolution loop rather than re-create.
+- **Reuse existing (user-global / plugin / a prior scaffold) when** a discovered agent fits the role — even approximately; refine via the evolution loop rather than re-create.
 - **Don't create for** a one-off step the Leader can do inline, a near-duplicate of an existing agent, or a role used only once with no reuse.
 
 Scaffold only after this gate says "create":
@@ -104,7 +108,7 @@ For each needed role:
   1. DISCOVER existing agents first (reuse > rebuild) — scan in order:
        a. project-local   .claude/agents/*.md
        b. user-global     ~/.claude/agents/*.md
-       c. all installed plugins' agents (bkit AND any others — review, feature-dev, madori, …)
+       c. all installed plugins' agents (review, feature-dev, madori, …)
      → a suitable fit exists → REUSE it (do not re-scaffold).
   2. No suitable agent → scaffold one:
        read  templates/agent.template.md   (researched high-performance template)
@@ -117,8 +121,8 @@ Then EVOLVE them from their output (loop below) — a scaffold is a first draft,
 
 - **How to write a strong agent** (frontmatter, description-triggers, system-prompt structure, length, tool scoping) → **`references/agent-authoring.md`** (synthesized from official docs + 36k/21k/12k★ collections). Read it before scaffolding.
 - **How to write a strong skill** — when a role needs a **reusable capability or heavy domain knowledge** (not a one-shot role), scaffold a project-local skill (`.claude/skills/<name>/SKILL.md`) instead of bloating an agent body, and reference it via the agent's `skills:` field (which only references — it never auto-creates). → **`references/skill-authoring.md`** (CC official: <500 lines, description=triggers-only, progressive disclosure).
-- **Agents self-evolve from their output (bounded).** After an owned scaffolded agent runs, judge its output against the signals you already have (exit-predicate, QA, intent-audit) and, **only when the gap is a DEFINITION defect** (would recur — vague role, missing constraint, loose output-format, over-broad scope), rewrite its `.md` to fix exactly that. Stay under the **1500-word cap by compaction, never accretion**; if a role keeps failing, **split it** rather than inflate it. Max **2** evolution rounds/agent/sprint, then auto-pause `AGENT_EVOLUTION_EXHAUSTED`. Owned = cowork-sprint's own project-local scaffolds **only** — never rewrite borrowed plugin/user-global or the fixed shipped agents (`cowork-intent-auditor`, `cowork-facet-extractor`). Full loop (evaluate→diagnose→refine→re-dispatch→record) → **`references/agent-authoring.md` § Self-evolution**.
-- **Discovery is plugin-agnostic.** bkit, when present, is just one source in the pool above (its cto-lead team, gap-detector, qa agents) — reuse it like any other; bkit absent changes nothing about the discovery order. The Leader stays in main either way.
+- **Mid-cycle agent evolution is NARROWED to UNBLOCK ONLY.** During a sprint, rewrite an owned scaffolded agent's `.md` **only when that agent is BLOCKING a gate** (its output keeps failing the exit-predicate/QA so the sprint cannot proceed) AND the gap is a DEFINITION defect (would recur — vague role, missing constraint, loose output-format, over-broad scope). Fix exactly that, stay under the **1500-word cap by compaction, never accretion**; if a role keeps failing, **split it**. Max **2** unblock rounds/agent/sprint, then auto-pause `AGENT_EVOLUTION_EXHAUSTED`. Owned = cowork-sprint's own project-local scaffolds **only** — never rewrite borrowed plugin/user-global or fixed shipped agents (`cowork-intent-auditor`, `cowork-facet-extractor`). **All NON-blocking / quality improvements are NOT done mid-cycle — they are deferred to the terminal Retrospective phase (user-gated, see PHASE 2).** Full loop → **`references/agent-authoring.md` § Self-evolution**.
+- **Discovery is plugin-agnostic.** Any installed plugin's agents are just sources in the pool above — reuse them like any other; absence changes nothing about the discovery order. The Leader stays in main either way.
 - **This plugin ships one fixed agent — `cowork-intent-auditor`** (domain-agnostic Tier-2 intent audit, used by the intent-audit gate), found by the same discovery. Principle: **generic meta-roles ship fixed; domain-specific execution roles are scaffolded.**
 
 ## PHASE 1 — Sprint Execution  (autonomous to completion)
@@ -156,10 +160,11 @@ independent clusters dispatched concurrently):
       + AI directive-log + the mechanical-hygiene subset). Under the global git-safety gate (explicit user
       request; never push without it). Anti-pattern: settling for a bare `git commit` and skipping the
       directive-log — the cowork-commit step is required, not optional. Stage by name (no `git add .`).
-    · agent self-evolution (after a chunk, off the QA/intent-audit signals): if an OWNED scaffolded
-      agent fell short AND the gap is a DEFINITION defect (recurs, not a one-off), refine its `.md`
-      (≤1500-word cap, compact-not-append; split if mis-scoped), re-dispatch. Cap 2 rounds/agent →
-      else AGENT_EVOLUTION_EXHAUSTED. Borrowed/fixed agents are read-only. → references/agent-authoring.md
+    · agent evolution mid-cycle = UNBLOCK ONLY: refine an OWNED scaffolded agent's `.md` only if it is
+      BLOCKING a gate AND the gap is a DEFINITION defect (≤1500-word cap, compact-not-append; split if
+      mis-scoped), re-dispatch. Cap 2 rounds/agent → else AGENT_EVOLUTION_EXHAUSTED. Borrowed/fixed
+      agents read-only. NON-blocking quality improvements are collected, NOT applied — they surface in
+      the terminal Retrospective (PHASE 2, user-gated). → references/agent-authoring.md
     · update status.json as each sprint/cycle-phase completes (record on completion, not batched);
       record any agent evolution → agentEvolutions[]{name, round, reason, wordCount}
 
@@ -171,7 +176,7 @@ After all sprints: **consolidated report** — per sprint: what shipped, QA resu
 align docs/ to the shipped truth in one pass — `01-built` as-built + CLAUDE.md summary + built-complete
 plans → FROZEN/`04-legacy`. Anti-pattern: ending the sprint at the report and *proposing* doc-sync as a
 separate follow-up — that is exactly the drift this skill exists to prevent. Skipping doc-sync = the sprint
-is NOT done (docs left stale). Run it as the cycle's terminal step before declaring completion.
+is NOT done (docs left stale). Run it, **THEN run PHASE 2 — Retrospective** (user-gated) as the true terminal step before declaring completion.
 Default = **do NOT defer** — finish in-scope work this run. If something genuinely must carry to a future
 sprint, it is **never silently dropped or silently expanded**, AND the report MUST state the **explicit
 written reason** it was carried (why it could not finish now). Surface any sprint that paused unresolved.
@@ -181,17 +186,38 @@ written reason** it was carried (why it could not finish now). Surface any sprin
 - **If a sprint preserves external behavior while changing how the code is built** → read the right ref first (both preserve behavior, so both mandate a characterization/**parity harness** over the changed surface BEFORE editing — else the QA gate is false-green — plus incremental change + adversarial 2-lens review). Distinguisher = *what* changes:
   - **`references/refactoring.md`** — the **internal code structure** changes; substrate stays (rename/extract/restructure).
   - **`references/migration.md`** — the **tech/data substrate** moves (library/framework/version/DB/data/API). Adds data-safety, cutover, rollback, irreversibility, dependency-pinning. *(sooji's Hono swap + session-hash live here.)*
-- bkit present → a sprint's cycle MAY borrow bkit agents/skills internally (e.g. gap-detector for the QA gate, /simplify for cleanup) — **but never expose bkit's split `/pdca plan|design|do` command flow to the user.** The whole cycle stays one autonomous conversation.
+- A sprint's cycle MAY borrow other installed plugins' agents/skills internally (e.g. /simplify for cleanup) — **but never expose another tool's split command flow to the user.** The whole cycle stays one autonomous conversation.
 
-## bkit-aware degradation
+## PHASE 2 — Retrospective (회고)  (terminal, user-gated)
 
-| | bkit present | standalone (no bkit) |
-|---|---|---|
-| Team | borrow bkit agents **(embodied in main, not `Agent(cto-lead)`)** | Leader + scaffolded local agents |
-| Phase skills | reuse `gap-detector`, `/simplify`, qa skills *internally* | built-in cycle + `Bash` (stack's typecheck/test + git) |
-| UX | **same single `/cowork-sprint` conversation** — no split commands | identical |
+> Runs AFTER the consolidated report + `/cowork-doc-sync`, as the sprint's final step. Produces PROPOSALS only — nothing is auto-applied. The user picks what to apply at an apply-gate.
 
-The user experience is identical with or without bkit. bkit only enriches the internal toolset.
+**Hard rule — repo-local outputs ONLY.** This plugin ships to all users, so the retrospective must NOT assume any personal system exists: **never write to CC memory (`~/.claude/.../memory`), `~/.claude/rules`, or any external wiki/vault.** Allowed targets = the project's `docs/` (taxonomy) + project-local `.claude/agents/*.md`.
+
+Three things the retrospective does (A + C + E):
+
+```
+A. Agent & team review
+   - Scorecard per OWNED scaffolded agent from signals already collected
+     (QA pass, matchRate, fix-rounds, intent-audit verdict, unblock-evolution rounds).
+   - Extract ONLY recurring DEFINITION defects → propose `.md` diffs (compact-not-accrete; split if mis-scoped).
+   - Team-shape proposals: retire unused roles / split overloaded ones.
+   - Applied (on approval) to project-local .claude/agents/<name>.md only.
+
+C. Knowledge capture (LOCAL docs only)
+   - Non-obvious learnings → docs/00-reference/<topic>.md (or a "Lessons" section of the retro report).
+   - Decision log (WHY) → already fed to /cowork-doc-sync.
+   - Reusable-asset promotion: prompts/scripts/agents that worked → project-local .claude/agents/ or repo templates/.
+   - NEVER to memory/rules/vault.
+
+E. Carry (unfinished) triage
+   - Residual/unfinished → new dated docs/02-planned/<dt>-<carry>-plan.md, EACH with an explicit written reason
+     it could not finish now. No silent drop, no silent expansion.
+```
+
+Output = one retrospective report `docs/05-reports/<dt>-<sprint>-retrospective.md` (Agent scorecard + proposals, Lessons, asset-promotion candidates, Carry+reasons), followed by an **apply-gate**: the user selects which proposals to apply; only approved items are written (agent `.md` edits, 00-reference learnings, asset promotion, carry plans).
+
+Parked (NOT in scope, recorded only if surfaced): process/method meta-edits to the skill itself, and risk/cost retrospect — out of the default A+C+E set.
 
 ## Gates & safety
 
@@ -221,5 +247,6 @@ PHASE 1 runs unattended, so "when do I stop and ask the human" must be explicit.
 ## Constraints
 
 - Needs a goal or plan input. For a single quick edit with no multi-step scope, just do the work directly — don't spin up a sprint.
+- **Single FEATURE (one cohesive feature, multi-step but not multi-sprint) → use `/pdca-wf`** (this plugin): one PDCA cycle with native Workflow as the execution engine (main owns Plan/Design; Research/Do/Check run as Workflow scripts; verify-to-100). cowork-sprint is for MULTI-feature initiatives; PHASE 1 calls pdca-wf **execution-only** (per-feature design doc + WorkList were frozen in PHASE 0 — never let pdca-wf re-enter its interactive Phases 1–3 mid-run).
 - Leader never delegates leadership to a subagent (see *Execution Model*).
 - Files referenced every run: `templates/agent.template.md`, `references/agent-authoring.md`, `references/sprint-method.md` — read them when the relevant step arrives (don't assume from memory).
