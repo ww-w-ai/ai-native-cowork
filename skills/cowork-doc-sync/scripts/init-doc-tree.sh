@@ -6,7 +6,7 @@ set -euo pipefail
 
 DOCS_DIR="${1:-docs}"
 
-# Numbered taxonomy (our authored docs). Tool-generated dirs (commit-log, bkit) are NOT created here.
+# Numbered taxonomy (our authored docs). Tool-generated dirs (commit-log etc.) are NOT created here.
 FOLDERS=(
   "00-reference"
   "01-built"

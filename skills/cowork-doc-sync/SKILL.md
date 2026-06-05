@@ -72,6 +72,6 @@ Decisions **span multiple sessions.** Looking at the current session only misses
 
 - **Do not fill LIVING docs with speculation** — only facts confirmed from code/decisions. If unknown, confirm with the user.
 - **Code-health report is advisory, not blocking** — never auto-fix, never let it slow the doc-alignment primary job. Same evidence discipline as docs (file:line, no speculation). Lightweight observation pass, not a full audit.
-- Tool-generated artifacts (commit-log, bkit/*) are not absorbed into the taxonomy (taxonomy §4).
+- Tool-generated artifacts (commit-log etc.) are not absorbed into the taxonomy (taxonomy §4).
 - git is the safety net for moves/deletes — but if it feels irreversible, confirm with the user.
 - If a new folder scaffold is needed, use `scripts/init-doc-tree.sh <docs_dir>`.

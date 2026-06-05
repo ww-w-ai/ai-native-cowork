@@ -114,7 +114,7 @@ Borrowed from Claude Code `/goal` (a verified built-in, v2.1.139) and hardened p
 **Truthful completion (ralph rule):** declare a phase done ONLY when its predicate is genuinely, verifiably true. Never emit a false "done" to escape the loop — being stuck is a *pause*, not a finish.
 
 **Iterate loop — convergence & stop:**
-- Target = the predicate holds. **Engineering code sprints: `matchRate == 100%`** + the project's mechanical baseline green (§5 QA gate — type/compile + lint + tests in the stack's **own** tools, not a fixed `tsc`-only assumption) — this is the bypass-pdca family standard; do **NOT** apply bkit's default 90% here. Non-code sprints: the sprint's own declared verifiable predicate.
+- Target = the predicate holds. **Engineering code sprints: `matchRate == 100%`** + the project's mechanical baseline green (§5 QA gate — type/compile + lint + tests in the stack's **own** tools, not a fixed `tsc`-only assumption) — do **NOT** settle for a 90% floor here. Non-code sprints: the sprint's own declared verifiable predicate.
 - **Cap = 5** fix-and-recheck rounds. On each fail, **inject the failure reason** (which check failed, what the output was) into the next round's context — fix with the evidence, never re-run blind.
 - If the cap is hit and the predicate still doesn't hold → do **NOT** claim "done." Pause (ITERATE_EXHAUSTED), record what's still off, and **carry** the remainder **only with an explicit written reason captured for the final report** — never a silent or unexplained deferral (CLAUDE.md "don't defer; if you must, state why").
 

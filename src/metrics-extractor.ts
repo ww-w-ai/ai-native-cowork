@@ -409,13 +409,13 @@ export function extractMetrics(
           metrics.toolCounts[key] = (metrics.toolCounts[key] || 0) + 1
         }
 
-        // Track agent calls — prefer subagent_type (named agents like bkit:gap-detector),
+        // Track agent calls — prefer subagent_type (named plugin agents),
         // fall back to description (ad-hoc agents)
         if (toolName === 'Agent') {
           const subType = (input as Record<string, string>).subagent_type
           let agentKey: string
           if (subType && subType !== 'general-purpose' && subType !== 'none') {
-            // Named agent (e.g., bkit:gap-detector, Explore)
+            // Named agent (e.g., feature-dev:code-reviewer, Explore)
             agentKey = `Agent:${subType}`
           } else {
             // Ad-hoc agent — prefer name (addressable identifier), fall back to description

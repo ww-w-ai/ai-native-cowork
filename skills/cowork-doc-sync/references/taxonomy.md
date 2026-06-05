@@ -55,7 +55,7 @@ File convention: `05-reports`/`06-research` use a date prefix `YYYYMMDD-<topic>.
 | Source | Handling |
 |---|---|
 | `commit-log/` (cowork-commit recap) | Keep and commit. Valuable. **Not numbered** |
-| bkit `01-plan/`·`02-design/`·`03-analysis/`·`.bkit/` | **.gitignore** (PDCA scratch). Not tracked. Ignore |
+| other tools' generated scratch dirs (e.g. numbered plan/design dumps, tool state dirs) | **.gitignore**. Not tracked. Ignore |
 | Other tools | Noise = gitignore, valuable = leave as-is but **do not absorb** into 00-99 |
 
 > Principle: do not try to pull tool output into our taxonomy (a losing battle). If the name collides (`01-built` vs `01-plan`), disambiguate + this one-line rule is enough.

@@ -34,7 +34,7 @@ For fitting an existing project to the cowork-doc-sync taxonomy for the first ti
 4. Execute relocation (taxonomy §3 rules):
    - Whole doc superseded (fully-folded) → move to 04-legacy + tombstone
    - Section move → cut verbatim and paste into the destination doc. Delete the original location + a 1-line pointer if needed.
-   - Pure clutter → delete. Tool-generated artifacts (commit-log/bkit) → do not touch (§4).
+   - Pure clutter → delete. Tool-generated artifacts (commit-log etc.) → do not touch (§4).
    - ★ **Update inbound references (MUST)**: before moving, check blast radius (`grep -rn <basename>.md`). After moving, **fix broken LIVING/ACTIVE/manual → MOVED links** (if the plan was "current," redirect to as-built). intra-legacy/frozen internal links = preserve (history).
 5. Establish single LIVING authority: consolidate the current truth into 01-built. Assign status label headers.
 6. File the report as 05-reports/YYYYMMDD-cowork-doc-init.md (work record + skill defects found).
