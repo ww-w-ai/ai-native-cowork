@@ -183,6 +183,11 @@ independent clusters dispatched concurrently):
       the terminal Retrospective (PHASE 2, user-gated). → references/agent-authoring.md
     · update status.json as each sprint/cycle-phase completes (record on completion, not batched);
       record any agent evolution → agentEvolutions[]{name, round, reason, wordCount}
+    · PROGRESS PING (MANDATORY in autonomous runs): emit ONE line to the user every ~5 minutes of
+      wall-clock work OR at every cycle-phase/gate transition, whichever comes first — format:
+      `[sprint-id phase] doing X — next Y`. No detail dumps, no questions; just visibility. Long
+      silent stretches cause the user to interrupt a healthy run ("is it still working?") — the
+      ping is cheaper than a killed run.
 
 After each sprint cluster: **free-perspective augmentation pass** — step outside the plan and scan for
 improvements, risks, and out-of-plan impact the plan didn't anticipate (the open lens a plan-bound check
