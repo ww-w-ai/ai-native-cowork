@@ -9,7 +9,7 @@ description: USE for ANY single-feature build request — the default engine whe
 
 **Judgment (Plan·Design) stays in main with thinking; structured/bulk/parallel execution (Research·Do·Check) runs as Workflow scripts that drive to 100 — only the irreversible launch is gated back to main.**
 
-Single input for this skill's own design: `docs/02-planned/*-pdca-wf-design.md` (read it if extending the skill).
+This skill's own as-built: `skills/pdca-wf/docs/01-built/pdca-wf.md` (read it if extending the skill).
 
 ## Why this shape (hard constraints — do not fight these)
 

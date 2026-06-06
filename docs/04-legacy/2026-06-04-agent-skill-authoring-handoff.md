@@ -1,3 +1,5 @@
+> 상태: FROZEN (2026-06-06) — SUPERSEDED. v1.10.0 (873b94a)으로 출하 완료 — trigger-fit descriptions + authoring patterns. 현재 진실 = skills/*/SKILL.md + references/{agent,skill}-authoring.md
+
 # Agent/Skill 저작 표준화 — 세션 인계 (2026-06-04)
 
 > 컨텍스트: cowork-doc-sync code-health 기능 추가에서 출발 → "스킬/에이전트를 어떻게 만들어야 하는가" 표준 정립으로 확장.

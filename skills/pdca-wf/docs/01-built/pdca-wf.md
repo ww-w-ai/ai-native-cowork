@@ -1,5 +1,5 @@
 > 상태: LIVING — as-built. Live authority = `../../SKILL.md` + `../../references/*`. This is the consolidated as-built summary (supersedes the 02-planned design docs).
-> 최종 갱신: 2026-06-05 16:42
+> 최종 갱신: 2026-06-06 13:05
 
 # pdca-wf — as-built
 
@@ -10,7 +10,8 @@ Single-feature PDCA cycle with native Workflow as the execution engine. Lives in
 - **Orchestration**: `SKILL.md` — 6 phases (Research·Plan·Design·Do·Check·Report). Main owns Plan/Design (thinking); Research/Do/Check run as native Workflow scripts.
 - **Workflow script templates**: `references/workflow-scripts.md` — runtime contract (`export const meta` + ambient `agent/parallel/pipeline/phase/log/args`; top-level await/return OK; sandbox forbids Date/fs; schemas inlined by main).
 - **Schemas**: `references/schemas.md` — ResearchFindings, WorkList(+fileGroups), agentMap, GapResult, Report.
-- **Taxonomy + lifecycle**: `references/taxonomy-map.md` — cowork-doc-sync taxonomy outputs, datetime filenames, document lifecycle (01-built clean/section-merge, 02-planned strikethrough+delete), cowork-doc-sync handoff.
+- **Taxonomy + lifecycle**: `references/taxonomy-map.md` — cowork-doc-sync taxonomy outputs, datetime filenames, document lifecycle (01-built clean/section-merge; 02-planned strikethrough with noise cap: ≥50% struck AND ≥3 struck → delete struck items, <3 struck = keep), cowork-doc-sync handoff.
+- **Doc output templates**: `references/doc-templates.md` — fixed fill-in skeletons for Plan/Design(+WorkList)/Check/Report(+QA table, anticipated questions)/01-built section. Filled, never restructured.
 
 ## Key decisions (as-built)
 
@@ -19,6 +20,8 @@ Single-feature PDCA cycle with native Workflow as the execution engine. Lives in
 - **Verify-to-100 grounded**: for verifiable work the Check script RUNS the stack's real checks (verifyCmd); 100 requires executed-green AND lenses==100. Non-verifiable floors at ≥90.
 - **DONE predicate** (code-checkable: all WorkList items present + no blocker/major gaps) gates the irreversible design-doc delete — not the raw LLM float.
 - **Agent lifecycle**: discover/reuse via `agentType`; create/evolve in main (sandbox can't write files).
+- **Entry modes (Phase 0)**: interactive (no design doc → Phases 1-3 dialogue) vs **execution-only** (design doc with WorkList supplied — by user or cowork-sprint PHASE 1 — validate then jump to Phase 4; planning is never re-entered mid-autonomous-run).
+- **Trigger surface**: fires on implicit single-feature build requests ("이 기능 만들어줘", "implement X") — not only explicit skill-name mentions. NOT for multi-feature (cowork-sprint), <~30min trivial edits, pure Q&A.
 - **standalone — no external plugin dependency.**
 
 ## Quality history
@@ -27,4 +30,4 @@ RED→GREEN→REFACTOR (writing-skills): adversarial + application tests found 9
 
 ## Related
 
-Retrospective phase (A+C+E, repo-local only, user-gated) was designed alongside and implemented in `../../cowork-sprint/SKILL.md` PHASE 2 (mid-cycle agent evolution narrowed to unblock-only). See `cowork-sprint/SKILL.md`.
+Retrospective phase (repo-local only, user-gated) was designed alongside and implemented in `../../cowork-sprint/SKILL.md` PHASE 2 — re-centered on SELF-EVOLUTION after the first 12-sprint field run (A agent-evolution + B self-assessment with [FIXABLE-PROMPT|FIXABLE-SCRIPT|PROCESS] tags + C rule-promotion + E carry; fixed template `cowork-sprint/templates/retrospective.template.md` ending in a numbered APPLY-GATE table). Same field run added: per-sprint QA TABLE gate (Leader-built feature→check table; unchecked row without deferral reason = FAIL), INTEGRATION common-extraction pass after parallel fan-out, compact-return schema for verification panels, and `templates/sprint-report.template.md`. Mid-cycle agent evolution stays unblock-only.

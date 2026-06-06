@@ -1,3 +1,5 @@
+> 상태: FROZEN (2026-06-06) — SUPERSEDED. cowork-commit 스킬로 구현 완료 (2026-05-27~28 출하). 현재 진실 = skills/cowork-commit/SKILL.md
+
 # Commit Directive Log — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development

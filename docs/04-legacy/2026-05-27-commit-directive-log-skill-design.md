@@ -1,3 +1,5 @@
+> 상태: FROZEN (2026-06-06) — SUPERSEDED. cowork-commit 스킬로 구현 완료. 현재 진실 = skills/cowork-commit/SKILL.md + src/cli.ts
+
 # Commit Directive Log — recap-commit Integration Design Spec
 
 > 2026-05-27. Integrate a per-commit **verbatim directive-log file** into the existing

@@ -5,9 +5,9 @@ Claude Code plugin that records AI collaboration history per commit.
 ## Project Overview
 
 - **Type**: Claude Code plugin (skills + TypeScript engine)
-- **Version**: 1.6.2
+- **Version**: 1.11.0
 - **Runtime**: Bun (TypeScript, no package.json — uses manifest.json)
-- **Skills**: `/cowork-commit` (per-commit AI recap), `/cowork-insights` (session reports), `/cowork-sprint` (plan→execute sprint orchestrator), `/cowork-doc-sync` + `/cowork-doc-init` (docs/ organization)
+- **Skills**: `/cowork-commit` (per-commit AI recap), `/cowork-insights` (session reports), `/cowork-sprint` (plan→execute sprint orchestrator; QA-table gate + self-evolution retrospective), `/pdca-wf` (single-feature PDCA via native Workflow, verify-to-100), `/cowork-doc-sync` + `/cowork-doc-init` (docs/ organization)
 - **Agents**: `cowork-intent-auditor` (fixed, fresh-perspective Tier-2 intent audit)
 - **Hooks**: SessionStart agent-first guidance (`hooks/`)
 
@@ -19,7 +19,8 @@ manifest.json              # Plugin metadata (name, version, skills, agents, hoo
 skills/
   cowork-commit/SKILL.md   # Per-commit AI recap + directive log
   cowork-insights/SKILL.md # Session insight reports
-  cowork-sprint/           # Plan→execute sprint orchestrator (SKILL.md + references/ + templates/)
+  cowork-sprint/           # Plan→execute sprint orchestrator (SKILL.md + references/ + templates/{agent,sprint-report,retrospective})
+  pdca-wf/                 # Single-feature PDCA, native-Workflow engine (SKILL.md + references/ + docs/01-built)
   cowork-doc-sync/         # docs/ alignment (SKILL.md + references/ + scripts/)
   cowork-doc-init/SKILL.md # One-time docs/ taxonomy bootstrap
 agents/
@@ -38,6 +39,7 @@ src/
   generate-narrative.ts    # cowork-insights pipeline driver (summarize → LLM → render)
   html-report.ts           # HTML + Markdown report renderer
 docs/commit-log/           # Directive-log files (conversation + recap per commit)
+docs/01-built~99-misc/     # cowork-doc-sync taxonomy (legacy plans/specs → 04-legacy)
 evals/                     # Skill trigger accuracy tests
 ```
 
