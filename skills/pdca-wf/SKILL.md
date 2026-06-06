@@ -1,6 +1,6 @@
 ---
 name: pdca-wf
-description: Use when building one feature/task end-to-end with deterministic Workflow execution and verify-to-100 — i.e. a single PDCA cycle where Research/Do/Check are run as native Workflow scripts while planning stays in the main session. Triggers on "pdca workflow", "run this feature with workflow", "build + verify to 100", single-feature deterministic build. NOT for multi-feature initiatives (use cowork-sprint).
+description: USE for ANY single-feature build request — the default engine whenever the user asks to implement, build, add, or rework ONE feature/capability end-to-end, even without naming this skill. Trigger on "이 기능 만들어줘/구현해줘/추가해줘", "build/implement/add this feature", "rework X", a feature spec or design doc handed over for implementation, or explicit "pdca", "pdca workflow", "verify to 100". Runs one PDCA cycle - Plan/Design in main (thinking), Research/Do/Check as deterministic native Workflow scripts, quality loop to 100 with no mid-run pauses (only irreversible actions gate back). Also invoked execution-only by cowork-sprint per feature. DO NOT use for - multi-feature initiatives sharing one scope/timeline (use cowork-sprint), trivial single-file edits or quick fixes under ~30min (just do them), pure questions/research with no build.
 ---
 
 # pdca-wf — PDCA as a native Workflow execution engine
@@ -58,11 +58,11 @@ Create a TodoWrite todo per phase. Mark `in_progress` on entry, `completed` only
 
 ### Phase 2 — Plan (MAIN, thinking)
 - Read findings. Design the approach in the main session (thinking active — never delegate).
-- Write `02-planned/<dt>-<feature>-plan.md` (status ACTIVE-PLAN).
+- Write `02-planned/<dt>-<feature>-plan.md` (status ACTIVE-PLAN) — fill the Plan skeleton in `references/doc-templates.md` (fixed sections, fill slots).
 - Exit: plan file exists.
 
 ### Phase 3 — Design (MAIN, thinking) — 박제
-- Converge the design into `02-planned/<dt>-<feature>-design.md` (status ACTIVE-PLAN). **This doc is the single input to Do.**
+- Converge the design into `02-planned/<dt>-<feature>-design.md` (status ACTIVE-PLAN) — fill the Design skeleton in `references/doc-templates.md`. **This doc is the single input to Do.**
 - Produce a `WorkList` **as a JSON value** (schema in `references/schemas.md`) held in session AND embedded in the design doc for humans. Items: `{id, file, change, dependsOn}`.
 - **Main pre-processes the WorkList before Do**: topo-sort by `dependsOn`; build `fileGroups` (one array per file, dependency-ordered) so same-file items serialize and disjoint files parallelize.
 - Build `agentMap` `{[itemId]: agentType, fix: agentType}` from the agent-lifecycle step (discover/reuse/create). Omit entries to use the default workflow agent.
@@ -78,13 +78,13 @@ Create a TodoWrite todo per phase. Mark `in_progress` on entry, `completed` only
 - Invoke `Workflow({script, args:{designPath, verifyCmd, agentMap, dt, feature}})` using the Check template (schemas inlined).
 - **Verifiable work (`verifyCmd` set): the script RUNS the real stack checks first** (exit code, not opinion); matchRate==100 requires executed checks green AND lenses==100. Non-verifiable: lenses only, ≥90 floor.
 - Lenses = perspective-diverse verify (correctness / regression / design-fit) vs the design doc; gaps fixed with `parallel()`, loop until 100 or max 5.
-- Main re-stamps `date` and writes `05-reports/<dt2>-<feature>-check.md` (the check snapshot uses its OWN datetime, not Phase-0 `<dt>`).
+- Main re-stamps `date` and writes `05-reports/<dt2>-<feature>-check.md` (Check skeleton in `references/doc-templates.md`; snapshot uses its OWN datetime, not Phase-0 `<dt>`).
 - **Quality gate = NO BRANCH**: do not pause on matchRate<100. If max 5 exhausted < 100 → carry residualGaps to Report. Do not stop.
 - Exit: GapResult returned (100 or residual recorded).
 
 ### Phase 6 — Report + lifecycle (main)
-- Re-stamp `date` → `<dt3>`. Write `05-reports/<dt3>-<feature>-report.md` (phaseHistory passed through from Check's returned `iterations`/`testsRun`, NOT LLM-reconstructed; matchRate, residualGaps, carryItems).
-- Update `01-built/<feature>.md` (LIVING, as-built). See **Document lifecycle** below.
+- Re-stamp `date` → `<dt3>`. Write `05-reports/<dt3>-<feature>-report.md` — fill the Report skeleton in `references/doc-templates.md` (incl. QA table + anticipated questions; phaseHistory passed through from Check's returned `iterations`/`testsRun`, NOT LLM-reconstructed).
+- Update `01-built/<feature>.md` (LIVING, as-built; section skeleton in `references/doc-templates.md`). See **Document lifecycle** below.
 - Hand off to `/cowork-doc-sync` for final taxonomy alignment.
 - Exit: report + 01-built updated, planned reconciled.
 

@@ -2,6 +2,8 @@
 
 All execution-phase Workflow scripts MUST return schema-validated JSON via `agent(prompt, {schema})`. Never free-text + regex parsing (CLAUDE.md structured-output rule). `schema` is a raw JSON Schema object.
 
+**Compact-return rule:** verification/check results must stay parseable by main — confirmed findings + counts only, per-finding free-text fields capped (`maxLength` ~300), no transcript dumps. An oversized return gets truncated by the harness and stalls the gate.
+
 **Sandbox note:** scripts have no `fs` — they cannot read this file at runtime. **Main inlines the real schema object into the script string** before `Workflow({script})`. The templates' `{ /* ... */ }` placeholders are where main pastes these.
 
 ## ResearchFindings (Phase 1)

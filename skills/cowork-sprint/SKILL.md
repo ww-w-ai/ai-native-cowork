@@ -1,7 +1,7 @@
 ---
 name: cowork-sprint
 description: |
-  Plan-then-execute sprint orchestrator for multi-part work spanning several areas with sequential dependencies. Trigger on sprint plan, run sprints, plan and execute, /cowork-sprint, or implicit cues like "break this into sprints", "plan it all up front then build the whole thing", or any multi-feature initiative sharing one scope/timeline. Works like a real delivery team: ~1-human-week sprints, concurrent dispatch, leader (main session) dynamically scaffolds project-local agents for ANY domain (dev, marketing, research, ops, data). DO NOT use for single-file edits, one-shot bug fixes, work under ~a few hours, or a single-feature plan (use plain PDCA instead).
+  Plan-then-execute sprint orchestrator for multi-part work spanning several areas with sequential dependencies. Trigger on sprint plan, run sprints, plan and execute, /cowork-sprint, or implicit cues like "break this into sprints", "plan it all up front then build the whole thing", or any multi-feature initiative sharing one scope/timeline. Works like a real delivery team: ~1-human-week sprints, concurrent dispatch, leader (main session) dynamically scaffolds project-local agents for ANY domain (dev, marketing, research, ops, data). DO NOT use for single-file edits, one-shot bug fixes, work under ~a few hours, or a single-feature plan (use /pdca-wf instead).
 argument-hint: "[goal / feature set / plan-file(s)]  [--auto-plan]"
 allowed-tools:
   - Read
@@ -144,8 +144,24 @@ independent clusters dispatched concurrently):
         DIRECT inline                              — small / quick
         DIRECT Workflow (deterministic script)     — structured, bulk, repetitive, wide parallel
     · concurrency = Leader's concurrent dispatch from main (parallel Agents ‖ one fan-out Workflow)
+    · INTEGRATION after any parallel fan-out (MANDATORY step, before QA): Leader merges the slices
+      AND runs a COMMON-EXTRACTION pass — scan the new/changed files for duplicated/near-duplicate
+      helpers, configs, or patterns that parallel workers each rolled on their own → consolidate
+      into ONE shared implementation and verify only that one. N copies = N× the defect surface
+      (one flawed copy means all copies are flawed), and the consolidated helper is the only
+      place a later fix needs to land.
+    · Workflow verification panels MUST return a compact schema: confirmed findings + counts only,
+      per-finding reasoning capped (~300 chars), no transcript dumps — an oversized panel return
+      is unparseable by the Leader and stalls the gate.
     · QA gate per sprint: the phase's **exit predicate** must hold before deploy/deliver, and the
       Leader VERIFIES it by running the check (real exit code) — never by trusting a transcript claim.
+    · QA TABLE (MANDATORY — green runners alone are NOT QA): at QA entry the Leader BUILDS a
+      feature→check table for THIS sprint (every shipped feature/behavior gets a row: what proves it
+      works — test runner, manual probe, live check, or "deferred-to-deploy" with reason), then
+      CHECKS OFF each row and includes the table in the sprint report. The user never authors this —
+      the Leader derives rows from the sprint plan's deliverables. An unchecked row without an
+      explicit deferral reason = QA gate FAIL. (Prevents "35/35 green but features unverified".)
+      Persist per-sprint table → status.json `sprints[].qaTable`; consolidated table → final report.
       Mechanical baseline = **detect the stack, run ITS tools** (format-check+lint+type/compile+test;
       tooling differs by language — JS/TS tsc+eslint, Python ruff+mypy+pytest, Go vet+test, …; run only
       what the project has). Engineering target = baseline green + matchRate **100%**, cap **5** fix-rounds.
@@ -171,7 +187,7 @@ independent clusters dispatched concurrently):
 After each sprint cluster: **free-perspective augmentation pass** — step outside the plan and scan for
 improvements, risks, and out-of-plan impact the plan didn't anticipate (the open lens a plan-bound check
 misses); for code, invoke Skill(/simplify).
-After all sprints: **consolidated report** — per sprint: what shipped, QA result, and **carry items** —
+After all sprints: **consolidated report** — fill **`templates/sprint-report.template.md`** (FIXED structure, do not invent sections: per-sprint results / consolidated QA table from `sprints[].qaTable` / pending gates with unblockers / anticipated-questions preemptively answered / carry / next actions) —
 **immediately followed by `/cowork-doc-sync` (MANDATORY closing step, not optional, not a "later" suggestion)**:
 align docs/ to the shipped truth in one pass — `01-built` as-built + CLAUDE.md summary + built-complete
 plans → FROZEN/`04-legacy`. Anti-pattern: ending the sprint at the report and *proposing* doc-sync as a
@@ -194,7 +210,7 @@ written reason** it was carried (why it could not finish now). Surface any sprin
 
 **Hard rule — repo-local outputs ONLY.** This plugin ships to all users, so the retrospective must NOT assume any personal system exists: **never write to CC memory (`~/.claude/.../memory`), `~/.claude/rules`, or any external wiki/vault.** Allowed targets = the project's `docs/` (taxonomy) + project-local `.claude/agents/*.md`.
 
-Three things the retrospective does (A + C + E):
+Four things the retrospective does (A + B + C + E):
 
 ```
 A. Agent & team review
@@ -203,6 +219,18 @@ A. Agent & team review
    - Extract ONLY recurring DEFINITION defects → propose `.md` diffs (compact-not-accrete; split if mis-scoped).
    - Team-shape proposals: retire unused roles / split overloaded ones.
    - Applied (on approval) to project-local .claude/agents/<name>.md only.
+
+B. Self-assessment (balanced + actionability-tagged — MANDATORY structure)
+   - MUST list BOTH "what went well" AND "what went poorly / user had to catch" —
+     a wins-only retro is self-congratulation, not assessment. Mine the friction signals:
+     user corrections/interrupts mid-run, questions the user asked right after the report
+     (= what the report failed to answer), gates that fired late or not at all.
+   - Tag EVERY "went poorly" item with an actionability class:
+       [FIXABLE-PROMPT]  — improvable by editing this skill's SKILL.md / agent .md / dispatch prompt
+       [FIXABLE-SCRIPT]  — improvable by editing a script/Workflow template/schema (deterministic layer)
+       [PROCESS]         — needs a human decision or external change (not a source edit)
+   - FIXABLE-* items become concrete proposals at the apply-gate (with the target file named);
+     PROCESS items go to Carry or the report's open questions.
 
 C. Knowledge capture (LOCAL docs only)
    - Non-obvious learnings → docs/00-reference/<topic>.md (or a "Lessons" section of the retro report).
@@ -215,7 +243,9 @@ E. Carry (unfinished) triage
      it could not finish now. No silent drop, no silent expansion.
 ```
 
-Output = one retrospective report `docs/05-reports/<dt>-<sprint>-retrospective.md` (Agent scorecard + proposals, Lessons, asset-promotion candidates, Carry+reasons), followed by an **apply-gate**: the user selects which proposals to apply; only approved items are written (agent `.md` edits, 00-reference learnings, asset promotion, carry plans).
+**The retrospective's center of gravity = SELF-EVOLUTION** — its purpose is not to re-summarize the work (the consolidated report did that; QA table / pending gates / anticipated questions live THERE), but to make the NEXT run better by changing the sources that drive it. Every section must terminate in an evolution proposal or explicitly conclude "no change needed":
+
+Output = one retrospective report `docs/05-reports/<dt>-<sprint>-retrospective.md` — **fill `templates/retrospective.template.md`** (FIXED structure, do not invent sections: ① Agent evolution scorecard — zero-scaffold case must answer "was reuse right?" / ② Self-assessment with `[FIXABLE-PROMPT|FIXABLE-SCRIPT|PROCESS]` tags + target file = the evolution backlog / ③ Lessons with "promote to rule? yes(where)/no(why)" / ④ Carry, execution leftovers only). The template ends with the **APPLY-GATE table** — present it verbatim as numbered choices; only user-approved rows are applied; no response/interrupt → record the table as Carry (never silent-drop).
 
 Parked (NOT in scope, recorded only if surfaced): process/method meta-edits to the skill itself, and risk/cost retrospect — out of the default A+C+E set.
 
@@ -223,7 +253,7 @@ Parked (NOT in scope, recorded only if surfaced): process/method meta-edits to t
 
 - **Planning approval gate** (PHASE 0 step 6) — mandatory before execution unless `--auto-plan`.
 - **Irreversible / outward actions** (deploy, remote migration, push, mass delete) — pause for confirmation even in autonomous mode; for high-stakes, run an adversarial review first with **risk-selected lenses** (not a fixed count — pick lenses orthogonal to the action's risk; min = correctness + ≥1 dominant-risk lens). **For installable/runnable artifacts (plugins, libs, CLIs, templates), the consumer-environment lens is MANDATORY** — one structured LLM pass (≥high-confidence only, with an exclusion list): portability · undeclared deps · undocumented env/config · public-interface breaks · docs↔behavior drift · install→first-run integrity · new-required-input. The cheap mechanical subset (abs-paths, conflict markers, manifest validity) also runs per-commit (cowork-commit). 7-ask checklist + v1.6.0 case → references/sprint-method.md §5.
-- **QA gate** per sprint — must pass before deploy/deliver.
+- **QA gate** per sprint — must pass before deploy/deliver (includes the mandatory per-sprint QA table; unchecked row without deferral reason = FAIL).
 - **Git**: never commit/push without explicit user request (global rule). Stage by name, WHY-focused message, `Co-Authored-By: Claude`.
 
 ### Auto-pause triggers (the autonomous loop's stop contract)
@@ -249,4 +279,4 @@ PHASE 1 runs unattended, so "when do I stop and ask the human" must be explicit.
 - Needs a goal or plan input. For a single quick edit with no multi-step scope, just do the work directly — don't spin up a sprint.
 - **Single FEATURE (one cohesive feature, multi-step but not multi-sprint) → use `/pdca-wf`** (this plugin): one PDCA cycle with native Workflow as the execution engine (main owns Plan/Design; Research/Do/Check run as Workflow scripts; verify-to-100). cowork-sprint is for MULTI-feature initiatives; PHASE 1 calls pdca-wf **execution-only** (per-feature design doc + WorkList were frozen in PHASE 0 — never let pdca-wf re-enter its interactive Phases 1–3 mid-run).
 - Leader never delegates leadership to a subagent (see *Execution Model*).
-- Files referenced every run: `templates/agent.template.md`, `references/agent-authoring.md`, `references/sprint-method.md` — read them when the relevant step arrives (don't assume from memory).
+- Files referenced every run: `templates/agent.template.md`, `templates/sprint-report.template.md`, `templates/retrospective.template.md`, `references/agent-authoring.md`, `references/sprint-method.md` — read them when the relevant step arrives (don't assume from memory). **Templated outputs are filled, never restructured** — fixed sections, fill the slots.

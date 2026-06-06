@@ -16,3 +16,4 @@
 | 2026-06-02 17:07:46 | feat(cowork-sprint): force commit + doc-sync as mandatory cycle steps | [cowork-sprint-force-commit-doc-sync](./20260602-170746-cowork-sprint-force-commit-doc-sync.md) |
 | 2026-06-04 15:48:22 | feat: trigger-fit skill descriptions + adopted authoring patterns (3-layer) — v1.10.0 | [authoring-patterns-and-trigger-fit-descriptions](./20260604-154822-authoring-patterns-and-trigger-fit-descriptions.md) |
 | 2026-06-05 23:57:28 | feat: /pdca-wf skill + cowork-sprint retrospective/execution-only integration (fully standalone) | [pdca-wf-skill-retrospective-standalone](./20260605-235728-pdca-wf-skill-retrospective-standalone.md) |
+| 2026-06-06 12:50:24 | feat: field-test-driven evolution — QA table gate, evolution-centric retro, output templates, stronger triggers | [field-test-driven-skill-evolution](./20260606-125024-field-test-driven-skill-evolution.md) |
