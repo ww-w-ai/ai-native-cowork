@@ -3,7 +3,7 @@
 > Detail for `cowork-sprint`. The SKILL.md is the thin orchestrator; this file holds the
 > heuristics and the state schema. Self-contained — do not defer to global CLAUDE.md at runtime.
 
-> Contents: 1 Sizing · 2 Dependency & execution mode · 3 Planning dialogue · 4 Execution patterns · 5 Cycle & gates · 5b Exit predicate · 6 status.json schema · 7 Resume.
+> Contents: 1 Sizing · 2 Dependency & execution mode · 3 Planning dialogue · 4 Execution patterns · 5 Cycle & gates · 5b Exit predicate · 5c Worktree isolation & auto-merge · 6 status.json schema · 7 Resume.
 
 ## 1. Sprint sizing (human-week unit)
 
@@ -61,8 +61,9 @@ Output of PHASE 0: a roadmap (sprint list + order + parallelism + assigned agent
 Each sprint runs a full cycle. The phase names are internal stages (never user sub-commands):
 
 ```
+[worktree setup, ONCE — if source-mutating; §5c]
 research → plan-detail → design → do → QA → fix → intent-audit → commit → deploy/deliver
-                                                                   (then ONCE after all sprints → doc-sync)
+                              (then ONCE after all sprints → doc-sync → [auto-merge, if worktree; §5c])
 ```
 
 - **commit** (per sprint, after its gate is green) is MANDATORY via `/cowork-commit` — never a bare `git commit` (it adds the WHY message + Co-Authored-By + AI directive-log + the mechanical-hygiene subset). Under the global git-safety gate (explicit user request; never push without it).
@@ -119,6 +120,53 @@ Borrowed from Claude Code `/goal` (a verified built-in, v2.1.139) and hardened p
 - If the cap is hit and the predicate still doesn't hold → do **NOT** claim "done." Pause (ITERATE_EXHAUSTED), record what's still off, and **carry** the remainder **only with an explicit written reason captured for the final report** — never a silent or unexplained deferral (CLAUDE.md "don't defer; if you must, state why").
 
 After each sprint cluster: **free-perspective augmentation pass** — step outside the plan and look for improvements, risks, and out-of-plan impact the plan didn't anticipate (the open lens a plan-bound check misses). For code, invoke `Skill(/simplify)`.
+
+## 5c. Worktree isolation & auto-merge (source-mutating roadmaps only)
+
+Two layers of isolation, nested:
+- **Within one session** — parallel subagents are de-conflicted by **file ownership** (one file = one role; shared files serialized to one writer per round). This is the existing `INTEGRATION` discipline (SKILL.md PHASE 1).
+- **Between sessions** — a **dedicated git worktree + branch** isolates this whole sprint run from the user's working tree AND from any OTHER independent session touching the same repo concurrently. The worktree is the layer ABOVE file-ownership: file-ownership cannot prevent two separate sessions from clobbering each other's edits in one shared tree — a worktree does. This is the PRIMARY motive.
+
+### Worktree setup (PHASE 1 entry — CONDITIONAL)
+
+**Trigger = the roadmap mutates source/code** (edits repo files, implements, refactors). Pure research / planning / docs-only / no-source-mutation roadmaps **skip this** — the worktree overhead is not justified; work in place.
+
+When triggered, the Leader runs ONCE at execution start, before the first cycle:
+
+```
+1. Detect the BASE BRANCH = the branch currently checked out (git rev-parse --abbrev-ref HEAD).
+   The sprint branches off THIS — never silently off main.
+2. slug = short kebab-case roadmap id (e.g. auth-billing-onboarding).
+3. git worktree add ../<repo>-sprint-<slug> -b sprint/<slug>     # off the base branch
+4. Run ALL source edits — inline AND every parallel subagent dispatch — with the worktree as cwd.
+```
+
+Caveat (already noted in SKILL.md *Dynamic local agents*): agents scaffolded **mid-session inside a worktree** may be missing from the session's agent registry — verify with one dispatch; on "Agent type not found" fall back to `subagent_type="general-purpose"` with "FIRST read .claude/agents/<role>.md" as the prompt's first step.
+
+### Auto-merge (terminal — automatic on completion, NOT an approval gate)
+
+A **local** merge is safe: full git history is retained and any merge is revertible (`git revert` / `reset`). So once verification passes, the Leader merges **automatically — no user-approval pause**. Verification is the precondition that gates it; user approval is not.
+
+Run **only after every other terminal step is green**, in this fixed order:
+
+```
+ALL sprints completed
+  → whole-roadmap verification GREEN (PRECONDITION — verification FAIL = no merge):
+       Leader RE-RUNS build/typecheck + the FULL test suite on the INTEGRATED worktree
+       (not per-slice trust — a slice's PASS can be stale once siblings merged in)
+  → intent-audit PASS (Tier-2)
+  → /cowork-doc-sync ran
+  → AUTO-MERGE (no pause):
+      a. Merge sprint/<slug> INTO THE BASE BRANCH IT FORKED FROM (main included — the merge is local).
+      b. Auto-cleanup: git worktree remove ../<repo>-sprint-<slug>
+                       + delete the merged sprint/<slug> branch (after the merge lands).
+```
+
+Hard safety rails (NEVER broken, even on the automatic path):
+- **No hook-skipping** (`--no-verify`, `--no-gpg-sign`) and **no force** anywhere.
+- **No auto-push.** The merge stays **LOCAL** — a remote `push` is always a separate, explicit user request, never automatic.
+- **Verification FAIL → merge SKIPPED.** A red build/test or a failed intent-audit blocks the merge; fix or carry with a written reason, never merge around it.
+- **Merge CONFLICT → STOP and report to the user.** Never auto-resolve, never force. (Auto-pause `MERGE_CONFLICT`.)
 
 ## 6. status.json schema
 

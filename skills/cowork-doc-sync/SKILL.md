@@ -18,8 +18,8 @@ Call at the **very end**, once implementation/refactoring/decisions are done. Al
 
 ## Required read (every call)
 
-- `references/taxonomy.md` — taxonomy + status + migration + tool separation + vault boundary (single spec)
-- Target repo's `docs/CONVENTION.md` (if present) — per-project override
+- `references/taxonomy.md` — taxonomy + status + migration + tool separation + vault boundary + **§6 local-config contract** (single spec)
+- The target repo's **local doc-sync config** — `docs/CONVENTION.md` **or** a `## doc-sync 범위` section in the repo `CLAUDE.md`/`AGENTS.md`. Per-project must-not-miss (sync surfaces beyond docs/, status-claim verification commands, derived-doc builds) per taxonomy §6. If **absent**, offer to scaffold one from the §6 contract before scanning.
 
 ## Determine scope (multi-session awareness — first)
 
@@ -48,6 +48,7 @@ Decisions **span multiple sessions.** Looking at the current session only misses
    if (LIVING doc diverges from code) → FIRST disambiguate which side is wrong (this is the human judgment):
      · doc is stale, code is the intended truth → update doc to current (verbatim facts, no speculation).
      · code betrays the doc/decision (a wrong fix / regression) → do NOT silently rewrite the doc to match the bad code; flag it in code-health (step 6).
+   if (status-claim drift) → docs asserting VCS/deploy/version/release STATE (labels: merged/deployed/pending/unshipped/vN) are high-rot + invisible to content drift → VERIFY against source-of-truth (VCS/CI/prod), never trust the label; relabel if stale. The local config (taxonomy §6 #4) supplies the HOW (which commands); absent it, at least check git merge/tag/branch state.
    if (ACTIVE-PLAN is built-complete) → fold current truth into 01-built → move plan to 04-legacy (+tombstone).
    if (doc is superseded) → move to 04-legacy + tombstone header.
 3. Classify: file the artifacts this work produced into the taxonomy.

@@ -116,6 +116,10 @@ For each needed role:
              — fill role, description(triggers), tools(least-privilege), model
              — body ≤ 1500-word HARD CAP (mechanically checked; compact, don't sprawl)
 In PHASE 1 dispatch them:  Agent(subagent_type="<role>")   or   Workflow agentType:"<role>"
+NOTE: agents scaffolded MID-SESSION (esp. in a worktree) may be absent from the session's
+agent registry ("Agent type not found") — verify with one dispatch; on failure fall back to
+subagent_type="general-purpose" with "FIRST read .claude/agents/<role>.md (your role card —
+follow exactly)" as the prompt's first step (equivalent behavior; proven 9/9 in practice).
 Then EVOLVE them from their output (loop below) — a scaffold is a first draft, not the final agent.
 ```
 
@@ -131,14 +135,38 @@ Then EVOLVE them from their output (loop below) — a scaffold is a first draft,
 Leader runs the approved roadmap. For each sprint (sequential clusters one by one;
 independent clusters dispatched concurrently):
 
+  WORKTREE SETUP (CONDITIONAL — runs ONCE at execution start, before the first cycle):
+    IF this roadmap MUTATES source/code (edits repo files, implements, refactors)
+      → the Leader creates a dedicated worktree + branch off the base branch and runs ALL
+        source edits (inline + parallel subagents) inside it:
+          git worktree add ../<repo>-sprint-<slug> -b sprint/<slug>   (off the base branch)
+      WHY: (1) isolates from the user's current working tree; (2) ★ a DIFFERENT independent
+        session touching the same repo concurrently won't collide — this session-level isolation
+        is the PRIMARY motive. The in-session file-ownership split (one file = one role, see
+        INTEGRATION below) only de-conflicts parallel subagents WITHIN one session; the worktree
+        is the layer ABOVE it (BETWEEN sessions).
+    ELSE (pure research / planning / docs-only / no source mutation)
+      → NO worktree (overhead not justified). Work in place.
+    Detailed procedure (slug, base-branch detection, agent-registry caveat) → references/sprint-method.md §5c.
+
   Phase gate: each phase's checklist → actual TodoWrite items (mandatory, not a passive list);
   phase N-1 must be complete (its exit condition met) before phase N starts. → references/sprint-method.md §5
 
   CYCLE per sprint:
-    research → plan-detail → design → do → QA → fix → intent-audit → commit → deploy/deliver
+    research → plan-detail → [Opus gap-review] → design → [Opus design-review] → do → QA → fix → intent-audit → commit → [Opus adversarial] → deploy/deliver
     (then, ONCE after all sprints: → doc-sync. Both commit & doc-sync are mandatory, not optional — see below.)
     · research = gather the facts THIS sprint needs before planning detail (codebase reality,
       external specs, constraints); never start `do` on assumptions (Research-before-Do).
+    · MODEL SPLIT (cost+quality): authoring=current model (Sonnet, fast); critical review=Opus.
+      [Opus gap-review] after plan-detail — Agent(model=opus) gap-analyzes the plan: missing
+        dependencies, wrong assumptions ("already implemented" that isn't), file/schema conflicts,
+        scope risks. Incorporate CRITICAL/HIGH findings before design. Skip if plan is trivial (<30min).
+      [Opus design-review] after design — Agent(model=opus) reviews correctness, edge cases,
+        architectural risk. Incorporate CRITICAL before do. Skip if design == plan-detail (unchanged).
+      do/QA = current model (Sonnet) — coding is fast, thinking not needed here.
+      [Opus adversarial] = the existing irreversible-action gate, run with model=opus explicitly.
+      Rationale: a parallel session proved Opus catches plan-killing bugs (nonexistent tables,
+      SCHEMA_VERSION collisions, missing infra) that Sonnet authoring missed.
     · choose an execution pattern per work-chunk:
         DELEGATE  (Agent swarm/parallel/council)  — exploratory, judgment, heterogeneous, few
         DIRECT inline                              — small / quick
@@ -197,7 +225,8 @@ After all sprints: **consolidated report** — fill **`templates/sprint-report.t
 align docs/ to the shipped truth in one pass — `01-built` as-built + CLAUDE.md summary + built-complete
 plans → FROZEN/`04-legacy`. Anti-pattern: ending the sprint at the report and *proposing* doc-sync as a
 separate follow-up — that is exactly the drift this skill exists to prevent. Skipping doc-sync = the sprint
-is NOT done (docs left stale). Run it, **THEN run PHASE 2 — Retrospective** (user-gated) as the true terminal step before declaring completion.
+is NOT done (docs left stale). Run it, then — IF a sprint worktree was created (source-mutating roadmap) —
+**run the AUTO-MERGE step** (below; automatic once verification is green, no approval pause), **THEN run PHASE 2 — Retrospective** (user-gated) as the true terminal step before declaring completion.
 Default = **do NOT defer** — finish in-scope work this run. If something genuinely must carry to a future
 sprint, it is **never silently dropped or silently expanded**, AND the report MUST state the **explicit
 written reason** it was carried (why it could not finish now). Surface any sprint that paused unresolved.
@@ -259,6 +288,7 @@ Parked (NOT in scope, recorded only if surfaced): process/method meta-edits to t
 - **Planning approval gate** (PHASE 0 step 6) — mandatory before execution unless `--auto-plan`.
 - **Irreversible / outward actions** (deploy, remote migration, push, mass delete) — pause for confirmation even in autonomous mode; for high-stakes, run an adversarial review first with **risk-selected lenses** (not a fixed count — pick lenses orthogonal to the action's risk; min = correctness + ≥1 dominant-risk lens). **For installable/runnable artifacts (plugins, libs, CLIs, templates), the consumer-environment lens is MANDATORY** — one structured LLM pass (≥high-confidence only, with an exclusion list): portability · undeclared deps · undocumented env/config · public-interface breaks · docs↔behavior drift · install→first-run integrity · new-required-input. The cheap mechanical subset (abs-paths, conflict markers, manifest validity) also runs per-commit (cowork-commit). 7-ask checklist + v1.6.0 case → references/sprint-method.md §5.
 - **QA gate** per sprint — must pass before deploy/deliver (includes the mandatory per-sprint QA table; unchecked row without deferral reason = FAIL).
+- **AUTO-MERGE** (terminal, only if a sprint worktree was created): a LOCAL merge is safe — full git history is retained and any merge is revertible (`git revert`/`reset`), so it runs **automatically once verification passes — no approval pause**. Precondition (gates the auto-merge; verification FAIL = no merge): **ALL** sprints done AND **whole-roadmap verification green** (build/typecheck + full test suite, re-run by the Leader on the integrated worktree — not per-slice trust) AND **intent-audit PASS** AND doc-sync ran. On green → the Leader automatically merges the `sprint/<slug>` branch into the **base branch it forked from** (the base it forked from — main included, since the merge is local), then auto-cleans up: `git worktree remove ../<repo>-sprint-<slug>` + delete the merged `sprint/<slug>` branch. Hard safety rails (NEVER broken even on the automatic path): NO hook-skipping (`--no-verify`/`--no-gpg-sign`), NO force, **NO auto-push** (merge stays LOCAL; remote push always requires explicit user request), verification FAIL → merge SKIPPED, merge **conflict → STOP and report to the user** (never auto/force-resolve). Procedure → references/sprint-method.md §5c.
 - **Git**: never commit/push without explicit user request (global rule). Stage by name, WHY-focused message, `Co-Authored-By: Claude`.
 
 ### Auto-pause triggers (the autonomous loop's stop contract)
@@ -269,7 +299,8 @@ PHASE 1 runs unattended, so "when do I stop and ask the human" must be explicit.
 - **ITERATE_EXHAUSTED** — fix-loop hit its cap (**5**) and the predicate still doesn't hold. Never emit a false "done" to escape the loop (truthful-completion); pause and report instead.
 - **AGENT_EVOLUTION_EXHAUSTED** — an owned scaffolded agent hit its evolution cap (**2** rounds) and its output still fails the predicate. The role is likely mis-scoped (split it) or the task needs human input — pause and report; don't keep rewriting the agent.
 - **BUDGET / TIME_EXCEEDED** — cumulative cost or wall-clock passes the user's stated bound (if any).
-- **IRREVERSIBLE_ACTION** — about to deploy/migrate/push/mass-delete (see above).
+- **IRREVERSIBLE_ACTION** — about to deploy/migrate/push/mass-delete (see above). (The terminal local AUTO-MERGE is NOT here — a local merge is revertible, so it runs automatically; only a remote push gates.)
+- **MERGE_CONFLICT** — the sprint-branch → base-branch auto-merge conflicts → STOP and report; never auto/force-resolve.
 
 **On resume, re-evaluate the pause reason first** — if it still fires, stop again and report rather than looping back into the same wall. (No event system — this is Leader discipline + `status.json`.)
 

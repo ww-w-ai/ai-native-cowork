@@ -69,3 +69,18 @@ File convention: `05-reports`/`06-research` use a date prefix `YYYYMMDD-<topic>.
 | Code implementation plan, design, refactoring plan | repo `02-planned` |
 
 Criterion: "is it product/business knowledge (→vault) vs engineering (→repo docs/)."
+
+## 6. Local project config contract (the standard each repo instantiates)
+
+This file is the **generic default**. Each repo declares its **project-specific** doc/folder management in a **local doc-sync config** — either `docs/CONVENTION.md` (formal hook) **or** a `## doc-sync 범위` (doc-sync scope) section in the repo's `CLAUDE.md`/`AGENTS.md`. The skill reads it **every run**; if absent, offer to scaffold one from this contract. The generic method stays in the skill; the per-project *what-not-to-miss* lives here.
+
+A conforming local config declares (fill what applies; omit where it inherits the default):
+
+1. **Taxonomy deviations** — non-default folders or numbering vs §1 (none = inherits §1).
+2. **LIVING authority** — the file(s) that are the single current truth (default: `01-built/<x>.md` + the root CLAUDE.md summary). List project additions.
+3. **Sync surfaces beyond `docs/`** — when a feature ships, which OTHER surfaces must align in the **same** pass. The skill aligns `docs/`; THESE are the project's extra must-not-miss. Enumerate, e.g.: user-facing whitepapers/manuals, the repo `CLAUDE.md`/`AGENTS.md`, AI-facing guides (help corpus, tool reference), QA/checklist seeds, contract "mirror surfaces" (schemas/messages/output shapes).
+4. **Status-claim verification** — docs that assert **VCS/deploy/version/release STATE** (labels like *merged / deployed / pending / unshipped / vN*) are **high-rot and invisible to content drift**. List each such label surface + HOW to verify against source-of-truth: e.g. merge = `git branch --contains <c>`, deploy = last-deploy time vs last code commit, version = the code constant, DB = `<migrate-tool> list --remote`. doc-sync MUST verify + relabel, never trust the label. *(Real failure: a "unshipped" label that was actually deployed nearly drove a redundant re-deploy.)*
+5. **Derived/built docs** — any "edit source → run build → never hand-edit the derived/public copy" chains. List source → derived + the build command (e.g. whitepaper `build.sh` → `public/*.html`).
+6. **vault vs repo specifics** — project tags/paths if the §5 boundary needs detail.
+
+**Skill behavior tie-in:** the generic **status-claim drift** class (#4) is a default drift class in the workflow — docs asserting merge/deploy/version/release state are verified against source-of-truth (VCS/CI/prod), not just code content. The local config supplies the *HOW* (which commands). If a repo has no local config, the skill still applies §1–§5 defaults + flags that project-specific surfaces (#3,#4) are undeclared.
