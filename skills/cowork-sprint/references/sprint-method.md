@@ -76,7 +76,7 @@ research → plan-detail → design → do → QA → fix → intent-audit → c
 Gates fire at **different phases** (catch drift early, not just at the end):
 - **Research sign-off** (before `plan-detail`): the facts THIS sprint depends on are gathered — codebase reality, external specs, constraints, prior art. Never enter `do` on assumptions (CLAUDE.md "Research-before-Do" — Research-less Do is an anti-pattern).
 - **Design sign-off** (before `do`): the design/approach is coherent and matches the sprint plan. Don't build on an incoherent design.
-- **QA gate** (before deploy/deliver): the phase's **exit predicate** (§5b) holds, verified by running the check. ★ **Mechanical baseline first — detect the project's stack and run *its* tools; never prescribe a fixed tool list.** The baseline is a *discipline* (format-check → lint → type/compile → test, all green), but the commands come from whatever **this** project uses — detect from `package.json` scripts / `Makefile` / `pyproject.toml` / `cargo` / `go.mod` / `bun` / etc. Examples (illustrative, **not** prescriptive — tooling differs by language): JS/TS → `prettier --check` + `eslint` + `tsc --noEmit` + `vitest`/`bun test`; Python → `ruff format --check` + `ruff` + `mypy` + `pytest`; Go → `gofmt -l` + `go vet` + `go test`; Rust → `cargo fmt --check` + `cargo clippy` + `cargo test`; a no-`package.json` Bun repo → `bun build` (typecheck) + `bun test`. **Run only the checks the project actually has configured** — a tool the project doesn't use is not a gate, and don't add one just to satisfy the gate. Then the predicate target `matchRate == 100%`. If no suitable test exists for the change, say so explicitly and add a minimal one — do not let "green" be a false signal (a test that doesn't exercise the change proves nothing). For data-flowing apps, also sanity-check the path end-to-end (input→store→output), not just unit-green.
+- **QA gate** (before deploy/deliver): the phase's **exit predicate** (§5b) holds, verified by running the check. ★ **Mechanical baseline first — detect the project's stack and run *its* tools; never prescribe a fixed tool list.** The baseline is a *discipline* (format-check → lint → type/compile → test, all green), but the commands come from whatever **this** project uses — detect from `package.json` scripts / `Makefile` / `pyproject.toml` / `cargo` / `go.mod` / `bun` / etc. Examples (illustrative, **not** prescriptive — tooling differs by language): JS/TS → `prettier --check` + `eslint` + `tsc --noEmit` + `vitest`/`bun test`; Python → `ruff format --check` + `ruff` + `mypy` + `pytest`; Go → `gofmt -l` + `go vet` + `go test`; Rust → `cargo fmt --check` + `cargo clippy` + `cargo test`; a no-`package.json` Bun repo → `bun build` (typecheck) + `bun test`. **Run only the checks the project actually has configured** — a tool the project doesn't use is not a gate, and don't add one just to satisfy the gate. Then the predicate target `matchRate == 100%`. If no suitable test exists for the change, say so explicitly and add a minimal one — do not let "green" be a false signal (a test that doesn't exercise the change proves nothing). For data-flowing apps, also sanity-check the path end-to-end (input→store→output), not just unit-green. ★ **This baseline is Axis 1 ("does it work?") only — it does NOT by itself prove `matchRate`.** The `matchRate` target is measured by **Axis 2 — gap-analysis** (WorkList ↔ actual output; "did we build all we declared?"), run as part of this gate per `references/gap-analysis.md`. Both axes must pass for QA green. Without Axis 2, tests can be green while half the declared WorkList is unbuilt (the tests cover only the built half) — a green baseline back-filling a false `matchRate` is the exact failure this two-axis split prevents. Skip Axis 2 only when the local config (§6A knob #6) declares it advisory. ★ **Measure-then-advance:** an *unmeasured* Axis-2 (matchRate not yet computed) is `not_measured` — go measure it; do NOT treat it as a failure. Only measured-and-below-threshold triggers the fix loop. Conflating "unmeasured" with "failed" deadlocks the gate (the discipline adapted from bkit's measure-before-advance FSM).
 - **Ship-hygiene mechanical scan** (before deploy/deliver — deterministic, no LLM): beyond the stack baseline above, run the **full mechanical pre-ship suite** — the cheap deterministic checks that catch "ships broken / leaks" classes the build/test baseline misses. The sprint gate runs the **proper full set** (the cheap subset — abs-paths + conflict markers + manifest validity — is the per-commit backstop in cowork-commit; sprint does NOT stop at that subset). Run all that apply to the repo:
   - **Secrets / private keys** — staged + working tree scanned for credentials/API keys/PEM blocks (gitleaks-class regex+entropy where available, else the cowork-commit secret regex).
   - **Merge-conflict markers** — `<<<<<<<` / `=======` / `>>>>>>>` shipped anywhere = broken file.
@@ -84,7 +84,7 @@ Gates fire at **different phases** (catch drift early, not just at the end):
   - **Manifest & config syntax validity** — every shipped `*.json`/`*.yaml`/`*.toml` (manifest, plugin.json, lockfile, CI workflow) parses; a malformed manifest breaks the consumer's install/load.
   - **Packaging hygiene** — no oversized/binary blob, scratch/build dir, or `.gitignore`d-but-referenced file accidentally staged; line-endings (CRLF in shell scripts), BOM, exec-bit/shebang on entry scripts, case/illegal-name conflicts for cross-OS clones.
   Off-the-shelf tooling exists for all of these (pre-commit-hooks, gitleaks/trufflehog, jq, shellcheck, actionlint) — use what the repo has; else a grep/parse backstop. All deterministic → flag mechanically; **ambiguous hits** (is this abs-path an intended doc example? is this a placeholder vs a live key?) escalate to the installer-POV LLM pass (irreversible gate), not silently dropped.
-- **Intent-audit gate** (Tier-2 metacognition, before deploy/deliver): the QA gate above is Tier-1 (*does the output match the plan?* — literal compliance). This gate asks the harder question — *does the result serve the **intent** behind the plan/prompt, or did it satisfy the letter and miss the point?* ★ It must be run from a **reset perspective**: dispatch the `cowork-intent-auditor` agent (or a discovered equivalent reviewer) — a fresh context that did NOT do the work, fed the intent + artifacts + QA result. The executor cannot audit its own intent-fit (its context is full of its own rationalizations). **PASS required before deploy**; on REVISE, fix and re-audit. Catches intent-drift, invented-vs-intended behavior, self-deception, and false-completion that Tier-1 is blind to.
+- **Intent-audit gate** (Tier-2 metacognition, before deploy/deliver): the QA gate above is Tier-1 (*does the output match the plan?* — literal compliance). This gate asks the harder question — *does the result serve the **intent** behind the plan/prompt, or did it satisfy the letter and miss the point?* ★ It must be run from a **reset perspective**: dispatch the `cowork-intent-auditor` agent (or a discovered equivalent reviewer) — a fresh context that did NOT do the work, fed the **intent (the PRD-lite §Success Metrics when present — the named yardstick; else the planning-dialogue intent)** + artifacts + the **gap-analysis result** (Tier-1 matchRate + gapItems). The executor cannot audit its own intent-fit (its context is full of its own rationalizations). **PASS required before deploy**; on REVISE, fix and re-audit. Catches intent-drift, invented-vs-intended behavior, self-deception, and false-completion that Tier-1 is blind to.
 - **Irreversible/outward gate**: deploy, remote migration, push, mass delete → confirm even in autonomous mode; for high-stakes run an adversarial review first. ★ **Lenses are risk-selected, not a fixed count** (same principle as the baseline gate above — don't hardcode a list). Pick lenses **orthogonal** to *this* action's risk surface; minimum = `correctness` + ≥1 lens for the action's dominant risk. Each lens catches a failure mode the others are structurally blind to. Catalog (illustrative):
   - **correctness / data-integrity** — wrong results, data loss (e.g. concurrent-write drop).
   - **integration / concurrency / regression** — cross-module interaction, interleaved/parallel edits, stale assertions.
@@ -187,6 +187,8 @@ Path: `.ww-w-ai/cowork-sprint/status.json`
       "status": "pending | in-progress | blocked | completed | failed | archived",
       "pattern": "delegate | inline | workflow | mixed",
       "matchRate": null,
+      "gapItems": [],
+      "prdRef": null,
       "retries": 0,
       "startedAt": "ISO8601",
       "completedAt": null
@@ -206,6 +208,56 @@ Path: `.ww-w-ai/cowork-sprint/status.json`
   "startedAt": "ISO8601"
 }
 ```
+
+- `matchRate` — the **measured** value from gap-analysis (§5 QA Axis 2), not a target.
+- `gapItems[]` — `[{ id, status, note }]` (`status` ∈ done|partial|missing|divergent) from the last gap-analysis run; enables resume + report without recompute.
+- `prdRef` — path to the PRD-lite for this sprint (null when skipped per §6A knob #2).
+
+## 6A. Local project config (generic default + override)
+
+cowork-sprint ships **generic defaults**. A repo MAY override them in a **local
+sprint config** — `docs/CONVENTION.md` **or** a `## cowork-sprint 범위`
+(cowork-sprint scope) section in the repo's `CLAUDE.md`/`AGENTS.md`. The Leader
+reads it **at PHASE 0 every run**; if absent, the defaults below apply (and the
+Leader MAY note that project-specific knobs are undeclared). Declare only what
+differs — omitted keys inherit the default. This mirrors the cowork-doc-sync §6
+local-config contract exactly (same files, read-every-run, omit-inherits-default,
+offer-to-scaffold).
+
+| # | Knob | Default | Override example |
+|---|------|---------|------------------|
+| 1 | PRD-lite sections | Problem / Success Metrics / Out-of-scope / Pre-mortem | add Compliance; drop Pre-mortem |
+| 2 | PRD-lite trigger | ≥2 features OR user-flagged uncertainty | always / never |
+| 3 | matchRate threshold | 100 (code sprints) | 90 |
+| 4 | matchRate method | flat (done/total) | priority-weighted |
+| 5 | Gap-analysis lenses | generic item↔evidence | dev: + code/file map + e2e input→store→output |
+| 6 | QA gate axes | both enforced (mechanical + gap) | gap advisory-only for non-code |
+| 7 | WorkList required fields | id, description, acceptanceEvidence, priority | add owner |
+| 8 | Intent-audit yardstick | PRD-lite §Success Metrics | + project KPI doc |
+| 9 | profile | none (generic) | dev (→ richer dev verification; see below) |
+| 10 | dev tier | standard (when profile=dev) | light / heavy |
+
+If no local config exists, offer to scaffold one from this table (same behavior as
+cowork-doc-sync). The generic *method* stays in the skill; the per-project
+*what-differs* lives in the local config.
+
+**Profiles (knob #9).** A profile is a named preset that flips a bundle of the
+above knobs to dev-appropriate defaults. `profile: dev` activates the dev preset
+(intent-anchor propagation, gap-analysis dev lens, plan scheduler, measure-then-
+advance + auto-pause, plus tier-scaled extras) — full activation rules, the
+complexity-tier table (knob #10: light/standard/heavy), the knob bundle, and the
+bkit-persona→mechanism map live in **`references/dev-profile.md`**. Read it when a
+sprint resolves to `profile: dev`. Auto-detection (dev markers in repo root) only
+*suggests* the profile; it applies only after the PHASE 0 approval gate. Absorb the
+mechanism, not the mandate — every dev knob is a default you can override or disable.
+
+### WorkList item shape (knob #7)
+Each WorkList item frozen in PHASE 0 carries, by default,
+`{ id, description, acceptanceEvidence, priority }`. `acceptanceEvidence` = the
+artifact/behavior that proves the item done — REQUIRED, because gap-analysis
+(§5 QA Axis 2 / `references/gap-analysis.md`) compares each item against it; an
+item with no evidence is unmeasurable. `priority` enables knob #4 weighting.
+Promote to `templates/worklist.template.md` only if this shape recurs.
 
 - `agentEvolutions[]` — audit trail for the self-evolution loop (SKILL.md *Dynamic local agents* + agent-authoring.md § Self-evolution). One entry per refinement of an **owned** scaffolded agent. `wordCount` proves the ≤1500-word cap held. Cap **2** rounds/agent/sprint, then `AGENT_EVOLUTION_EXHAUSTED`.
 

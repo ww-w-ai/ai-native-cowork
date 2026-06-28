@@ -73,25 +73,39 @@ Main Session = cowork-sprint Leader
 > This is the "freeze-before-code" principle: converge in dialogue → freeze plans → those frozen plans are the single input to execution.
 
 ```
+0. Read the local sprint config (§6A) — docs/CONVENTION.md or a `## cowork-sprint 범위`
+   section in CLAUDE.md/AGENTS.md. Apply its knob overrides for this run; if absent, use
+   defaults and note project-specific knobs are undeclared (offer to scaffold one).
+   If the config sets no profile, detect dev markers (package.json/go.mod/Cargo.toml/
+   pyproject.toml/…) and SUGGEST `profile: dev` (richer dev verification —
+   references/dev-profile.md); apply it only after the step-7 approval gate, never auto.
 1. Understand scope (dialogue with the user, one question at a time when ambiguous).
-2. Size the work in HUMAN terms (~1 human-week = 1 sprint). Split anything bigger.
+2. ★ PRD-lite (intent anchor) — when multi-feature OR high-uncertainty (knob #2;
+   default ≥2 features OR user-flagged uncertainty): fill templates/prd-lite.template.md
+   (Problem / Success Metrics / Out-of-scope / Pre-mortem) BEFORE the WorkList — it is
+   the input the WorkList/design derive from, and the yardstick the Tier-2 intent-audit
+   measures against. Set status.json prdRef. Trivial/single-feature → record
+   "PRD-lite skipped" and proceed.
+3. Size the work in HUMAN terms (~1 human-week = 1 sprint). Split anything bigger.
    - Build the sprint list + dependency graph (which sprints are independent vs ordered).
    - Decide execution mode per cluster: independent → eligible for concurrent dispatch;
      ordered/high-risk/LIVE → sequential.
-3. Identify the ROLES this project needs (dev? QA? researcher? copywriter? analyst?).
+4. Identify the ROLES this project needs (dev? QA? researcher? copywriter? analyst?).
    - Scaffold project-local agents for missing roles  →  see "Dynamic agents" below.
-4. Write a plan per sprint (goal, deliverables, cycle outline, deps, role assignments)
+5. Write a plan per sprint (goal, deliverables, cycle outline, deps, role assignments)
    into docs/  (repo) — these are the durable single input to PHASE 1.
    For every feature chunk that PHASE 1 will execute via /pdca-wf: ALSO converge its
-   per-feature design doc + WorkList HERE (pdca-wf Phases 1-3 equivalent), so PHASE 1
-   invokes pdca-wf in execution-only mode (design doc in → Phase 4 直行). Planning is
-   interactive; deferring it into PHASE 1 would pause the autonomous run per feature.
-5. Initialize .ww-w-ai/cowork-sprint/status.json  (schema → references/sprint-method.md).
-6. ★ APPROVAL GATE: present the roadmap (sprints, order, parallelism, agents) and get
+   per-feature design doc + WorkList HERE (pdca-wf Phases 1-3 equivalent). Each WorkList
+   item carries { id, description, acceptanceEvidence, priority } (knob #7) so the QA
+   Axis-2 gap-analysis can measure matchRate. PHASE 1 invokes pdca-wf execution-only
+   (design doc in → Phase 4 直行). Planning is interactive; deferring it would pause
+   the autonomous run per feature.
+6. Initialize .ww-w-ai/cowork-sprint/status.json  (schema → references/sprint-method.md).
+7. ★ APPROVAL GATE: present the roadmap (sprints, order, parallelism, agents) and get
    the user's go. Do NOT start execution before approval.
 ```
 
-- `--auto-plan` → run steps 1-5 autonomously (sensible defaults, no dialogue), still write plans + show the roadmap, then proceed.
+- `--auto-plan` → run steps 0-6 autonomously (sensible defaults, no dialogue), still write plans + show the roadmap, then proceed.
 - Detailed sizing heuristic, planning-dialogue guidance, and the dependency rules live in **`references/sprint-method.md`**.
 
 ## Dynamic local agents (general team-building)
