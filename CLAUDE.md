@@ -24,7 +24,12 @@ skills/
   cowork-doc-sync/         # docs/ alignment (SKILL.md + references/ + scripts/)
   cowork-doc-init/SKILL.md # One-time docs/ taxonomy bootstrap
 agents/
-  cowork-intent-auditor.md # Fixed Tier-2 intent auditor (fresh-perspective, read-only)
+  cowork-intent-auditor.md  # Fixed Tier-2 intent auditor (fresh-perspective, read-only)
+  cowork-facet-extractor.md # Fixed per-session facet extractor (cowork-insights)
+  # dev-profile vendored expert legion (Apache-2.0 from bkit — see THIRD-PARTY-NOTICES.md):
+  gap-detector · code-analyzer · design-validator · security-architect ·
+  qa-test-planner · qa-test-generator · frontend-architect · infra-architect ·
+  enterprise-expert · bkend-expert(optional, bkend.ai-only)
 hooks/
   hooks.json               # SessionStart wiring
   session-start.sh         # Agent-first guidance injected as additionalContext

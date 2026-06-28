@@ -1,6 +1,6 @@
 # Design: PRD → WorkList → Gap-Analysis → Intent-Audit chain for cowork-sprint
 
-> 상태: ACTIVE-PLAN — 구현 전 설계 (single input for implementation)
+> 상태: BUILT (v1.13.0) — as-built. Live authority = `skills/cowork-sprint/references/{gap-analysis,dev-profile}.md` + `sprint-method.md` §6A. Design-of-record; for current behavior read the skill.
 > Scope: `skills/cowork-sprint` only. Domain-agnostic, lightweight, repo-local.
 > Provenance: approach adapted from **bkit** (`bkit:sprint` prd phase + `gap-detector` agent, Apache-2.0).
 > Only the *method/approach* is adapted — no proprietary text copied. See §8.
