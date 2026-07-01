@@ -79,7 +79,7 @@ not hardcoded here.
 ## Local config
 matchRate threshold (#3), method flat/weighted (#4), lenses (#5), QA-axis
 enforcement (#6), and WorkList fields (#7) are read from the repo's sprint config
-(`docs/CONVENTION.md` or a `## cowork-sprint 범위` section in `CLAUDE.md`/`AGENTS.md`)
+(`docs/CONVENTION.md` or a `## cowork-sprint scope` section in `CLAUDE.md`/`AGENTS.md`)
 **every run**; omitted keys inherit the defaults above. See SKILL.md / sprint-method.md §6A.
 
 ## Provenance

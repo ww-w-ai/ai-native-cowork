@@ -16,7 +16,7 @@ Single-feature PDCA cycle with native Workflow as the execution engine. Lives in
 ## Key decisions (as-built)
 
 - **Three actors**: main = judgment; script = wiring; agent = work.
-- **Gate model (2 axes)**: quality (matchRate) = NO branch, loop-to-100 (max 5), miss → post-hoc report. Irreversible (push/deploy/vault) = gate stays in main (structural via least-privilege agents).
+- **Gate model (2 axes)**: quality (matchRate) = NO branch, loop-to-100 (max 5), miss → post-hoc report. Irreversible (push/deploy/vault) = gate stays in main (structural via least-privilege agents); before the launch main runs a thinking adversarial review (Check lenses are thinking-off, so main does the one judgment pass), then approves.
 - **Verify-to-100 grounded**: for verifiable work the Check script RUNS the stack's real checks (verifyCmd); 100 requires executed-green AND lenses==100. Non-verifiable floors at ≥90.
 - **DONE predicate** (code-checkable: all WorkList items present + no blocker/major gaps) gates the irreversible design-doc delete — not the raw LLM float.
 - **Agent lifecycle**: discover/reuse via `agentType`; create/evolve in main (sandbox can't write files).

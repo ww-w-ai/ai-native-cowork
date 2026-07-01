@@ -93,9 +93,9 @@ Create a TodoWrite todo per phase. Mark `in_progress` on entry, `completed` only
 | Gate | Axis | Handling |
 |---|---|---|
 | No-Go / matchRate<100 | quality | **no branch** — loop-to-100, on miss record residual gaps in report, keep going |
-| git push · deploy · vault bulk · remote migration | safety | **gate stays** — Workflow does everything up to it; the actual launch is approved in main |
+| git push · deploy · vault bulk · remote migration | safety | **gate stays** — Workflow does everything up to it; before the launch the main session runs a thinking adversarial review (Check lenses are thinking-off) and only then approves the launch |
 
-Quality is solved by score; safety is NOT (irreversible even at 100). Never auto-fire irreversible actions inside a Workflow.
+Quality is solved by score; safety is NOT (irreversible even at 100). Never auto-fire irreversible actions inside a Workflow. **Before the irreversible launch, main runs a thinking adversarial review** — risk-selected lenses (correctness + the action's dominant risk). The Workflow's Check lenses ran thinking-OFF (Workflow agents have no thinking), so this is the ONE thinking judgment pass before an irreversible action; only then approve. Safety axis only — it does NOT reopen the matchRate loop.
 
 Verifiable work targets 100%. Non-verifiable work floors at ≥90% (CLAUDE.md PDCA rule).
 
@@ -151,6 +151,6 @@ All execution-phase scripts return schema-validated JSON. Full schemas: `referen
 | 3 Design | main (thinking) | `02-planned/<dt>-<feature>-design.md` + WorkList | 박제 = Do input |
 | 4 Do | Workflow | code | — |
 | 5 Check/Act | Workflow loop-to-100 | `05-reports/<dt2>-<feature>-check.md` | quality: no branch |
-| 6 Report | main | report + `01-built/<feature>.md` + cowork-doc-sync | safety: irreversible gated |
+| 6 Report | main | report + `01-built/<feature>.md` + cowork-doc-sync | safety: thinking review → irreversible gated |
 
 References: `references/workflow-scripts.md` (script templates) · `references/schemas.md` (JSON schemas) · `references/taxonomy-map.md` (taxonomy + lifecycle + cowork-doc-sync handoff).

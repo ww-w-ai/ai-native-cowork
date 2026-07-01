@@ -53,7 +53,14 @@ Main Session = cowork-sprint Leader
 
 - ★ **Concurrency ≠ nesting.** Running many sprints "at once" = the Leader firing concurrent dispatches (parallel `Agent` calls ‖ a single fan-out `Workflow`). There is never a sub-leader. Workflow is a *direct-execution* method, not delegation — its spawned agents are flat workers, and that is correct, not a "lost team."
 - **Workflow only from main** (1-level — no Workflow inside Workflow; subagents don't author Workflows).
-- **Runs autonomously to completion** in PHASE 1 (no per-step confirmation) — except the planning approval gate and irreversible actions (see *Gates*).
+- **pdca-wf runs via `Skill(/pdca-wf)` in main, NEVER as `Agent(subagent)`.** Its Plan/Design assume main-thinking and its Do/Check author Workflows (main-only, 1-level) — inside a subagent both collapse (thinking-off + Workflow forbidden). Feature-to-feature parallelism comes from within-feature Workflow fan-out, not from wrapping pdca-wf in a subagent; pdca-wf runs are main-sequential.
+- **Runs autonomously to completion** in PHASE 1 (no per-step confirmation). A decision arising mid-run routes by a 3-tier rule — the flow is never interrupted for a decision:
+  1. **Low-risk / easily reversible** → the Leader decides and continues (logs the decision).
+  2. **One option is obviously dominant** (clear, large advantage over the alternatives) → decide and continue (log).
+  3. **Otherwise** (genuinely ambiguous, OR important but not irreversible) → do NOT pause: take the most reasonable default to keep moving (or skip just that sub-part), record it to `status.json deferredDecisions[]`, and present the whole batch to the user at the END (final report) for review/override.
+  - **Clarifying questions belong up front**: batch everything that needs the user at the PHASE 0 approval gate (one round) — the run assumes the user is away (overnight-safe), so no mid-run questions.
+  - **The only mid-run hard gates are irreversible/outward actions** (deploy · remote migration · commit/push · mass delete · doc-delete) — those still pause for explicit approval. Distinguish: *decision ambiguity* → defer to the end-batch (keep going); *irreversible execution* → gate mid-run (safety, not a decision).
+  - **Progress trail**: ~1 line per gate/phase (light, for an away user) — not a stream.
 
 ## Input interpretation
 
@@ -73,7 +80,7 @@ Main Session = cowork-sprint Leader
 > This is the "freeze-before-code" principle: converge in dialogue → freeze plans → those frozen plans are the single input to execution.
 
 ```
-0. Read the local sprint config (§6A) — docs/CONVENTION.md or a `## cowork-sprint 범위`
+0. Read the local sprint config (§6A) — docs/CONVENTION.md or a `## cowork-sprint scope`
    section in CLAUDE.md/AGENTS.md. Apply its knob overrides for this run; if absent, use
    defaults and note project-specific knobs are undeclared (offer to scaffold one).
    If the config sets no profile, detect dev markers (package.json/go.mod/Cargo.toml/
@@ -86,7 +93,11 @@ Main Session = cowork-sprint Leader
    the input the WorkList/design derive from, and the yardstick the Tier-2 intent-audit
    measures against. Set status.json prdRef. Trivial/single-feature → record
    "PRD-lite skipped" and proceed.
-3. Size the work in HUMAN terms (~1 human-week = 1 sprint). Split anything bigger.
+3. Size the work in HUMAN terms (~1 human-week = 1 sprint), then DERIVE the sprint count from that
+   estimate — **do NOT default to a fixed 3–6 regardless of size**; state the derivation (N deliverables
+   × ~1wk → N sprints). Size-tier anchor: Single 1 · Small 2–4 · Medium 5–8 · Large 9–12 (>12 → split into multiple roadmaps)
+   (→ references/sprint-method.md §1). Count is provisional here (the "define"/plan step) and may be
+   re-split/merged during step-5 detailing (the "design" step) — re-adjust + log.
    - Build the sprint list + dependency graph (which sprints are independent vs ordered).
    - Decide execution mode per cluster: independent → eligible for concurrent dispatch;
      ordered/high-risk/LIVE → sequential.
@@ -167,20 +178,29 @@ independent clusters dispatched concurrently):
   phase N-1 must be complete (its exit condition met) before phase N starts. → references/sprint-method.md §5
 
   CYCLE per sprint:
-    research → plan-detail → [Opus gap-review] → design → [Opus design-review] → do → QA → fix → intent-audit → commit → [Opus adversarial] → deploy/deliver
+    research → plan-detail → [indep gap-review] → design → [indep design-review] → do → QA → fix → intent-audit → commit → [adversarial before irreversible] → deploy/deliver
     (then, ONCE after all sprints: → doc-sync. Both commit & doc-sync are mandatory, not optional — see below.)
     · research = gather the facts THIS sprint needs before planning detail (codebase reality,
       external specs, constraints); never start `do` on assumptions (Research-before-Do).
-    · MODEL SPLIT (cost+quality): authoring=current model (Sonnet, fast); critical review=Opus.
-      [Opus gap-review] after plan-detail — Agent(model=opus) gap-analyzes the plan: missing
-        dependencies, wrong assumptions ("already implemented" that isn't), file/schema conflicts,
-        scope risks. Incorporate CRITICAL/HIGH findings before design. Skip if plan is trivial (<30min).
-      [Opus design-review] after design — Agent(model=opus) reviews correctness, edge cases,
-        architectural risk. Incorporate CRITICAL before do. Skip if design == plan-detail (unchanged).
-      do/QA = current model (Sonnet) — coding is fast, thinking not needed here.
-      [Opus adversarial] = the existing irreversible-action gate, run with model=opus explicitly.
-      Rationale: a parallel session proved Opus catches plan-killing bugs (nonexistent tables,
-      SCHEMA_VERSION collisions, missing infra) that Sonnet authoring missed.
+    · MODEL SPLIT (judgment in main, mechanics delegated):
+      authoring (plan-detail, design) = the LEADER in main (thinking ON, whatever model the session
+        runs — typically Opus). Deep judgment lives here, never in a subagent.
+      do / QA = delegated to /pdca-wf execution-only (its Workflow; thinking-off is fine, coding is
+        mechanical) — not a separate model choice here.
+      [indep gap-review] after plan-detail / [indep design-review] after design — an INDEPENDENT
+        fresh-context reviewer (subagent) reads the Leader's plan/design for missing deps, false
+        "already implemented" assumptions, file/schema conflicts, scope/edge/arch risk, and ★ **sprint
+        sizing (MANDATORY review item): each sprint ≈ 1 human-week — flag any over-large sprint (→ split)
+        or trivially-small one (→ merge); a mis-sized roadmap is a plan defect, not a nit**. Its value is
+        INDEPENDENCE (catches what the author's own context is blind to), NOT reasoning depth —
+        subagents run thinking-OFF (CC runAgent.ts:682), so a cheaper model suffices; don't mislabel
+        it "Opus deep review". Fold CRITICAL/HIGH back before proceeding; skip if trivial (<30min) or unchanged.
+      [adversarial before irreversible] = the safety gate: independent lenses (subagents, thinking-off
+        = independence) then the Leader's final judgment in main (thinking) before approving. Never
+        approve an irreversible action off a thinking-off review alone.
+      Why review at all: a fresh read catches plan-killers (nonexistent tables, SCHEMA_VERSION
+        collisions, missing infra) the author glosses over — an independence check, achievable without
+        thinking; not a reason to route authoring to a weaker model.
     · choose an execution pattern per work-chunk:
         DELEGATE  (Agent swarm/parallel/council)  — exploratory, judgment, heterogeneous, few
         DIRECT inline                              — small / quick
@@ -234,7 +254,7 @@ independent clusters dispatched concurrently):
 After each sprint cluster: **free-perspective augmentation pass** — step outside the plan and scan for
 improvements, risks, and out-of-plan impact the plan didn't anticipate (the open lens a plan-bound check
 misses); for code, invoke Skill(/simplify).
-After all sprints: **consolidated report** — fill **`templates/sprint-report.template.md`** (FIXED structure, do not invent sections: per-sprint results / consolidated QA table from `sprints[].qaTable` / pending gates with unblockers / anticipated-questions preemptively answered / carry / next actions) —
+After all sprints: **consolidated report** — fill **`templates/sprint-report.template.md`** (FIXED structure, do not invent sections: per-sprint results / consolidated QA table from `sprints[].qaTable` / pending gates with unblockers / anticipated-questions preemptively answered / **deferred-decisions batch (from `deferredDecisions[]` — the mid-run ambiguities skipped with a default, each with the default taken + why, for the user to review/override)** / carry / next actions) —
 **immediately followed by `/cowork-doc-sync` (MANDATORY closing step, not optional, not a "later" suggestion)**:
 align docs/ to the shipped truth in one pass — `01-built` as-built + CLAUDE.md summary + built-complete
 plans → FROZEN/`04-legacy`. Anti-pattern: ending the sprint at the report and *proposing* doc-sync as a
@@ -252,7 +272,7 @@ written reason** it was carried (why it could not finish now). Surface any sprin
   - **`references/migration.md`** — the **tech/data substrate** moves (library/framework/version/DB/data/API). Adds data-safety, cutover, rollback, irreversibility, dependency-pinning. *(sooji's Hono swap + session-hash live here.)*
 - A sprint's cycle MAY borrow other installed plugins' agents/skills internally (e.g. /simplify for cleanup) — **but never expose another tool's split command flow to the user.** The whole cycle stays one autonomous conversation.
 
-## PHASE 2 — Retrospective (회고)  (terminal, user-gated)
+## PHASE 2 — Retrospective  (terminal, user-gated)
 
 > Runs AFTER the consolidated report + `/cowork-doc-sync`, as the sprint's final step. Produces PROPOSALS only — nothing is auto-applied. The user picks what to apply at an apply-gate.
 

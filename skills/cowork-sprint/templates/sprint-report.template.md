@@ -1,52 +1,65 @@
 # Sprint Consolidated Report — {initiative} ({date})
 
-> 상태: FROZEN (작업 스냅샷). {N} sprints / {M} commits ({first}…{last}) / 배포: {summary}.
+> Status: FROZEN (work snapshot). {N} sprints / {M} commits ({first}…{last}) / Deploy: {summary}.
 
-<!-- RULE: 독자(사용자) 기준으로 작성. 읽은 직후 "그래서 X는?"이 나오면 §4 실패.
-     코드 식별자보다 화면/제품 언어 우선. -->
+<!-- RULE: Write for the reader (user). If "so what about X?" comes up right after reading, §4 has failed.
+     Prefer screen/product language over code identifiers. -->
 
-## 1. 스프린트별 결과
+## 1. Per-sprint results
 
-| Sprint | What shipped (제품 언어 한 줄) | QA | Commit |
+| Sprint | What shipped (one line, product language) | QA | Commit |
 |---|---|---|---|
 | {SP-1} | {…} | PASS / PASS+fixed({n}) / deferred | `{hash}` |
 
-적대 검증에서 잡혀 커밋 전 수정된 결함: {n}건 — {한 줄 목록, 없으면 "없음"}
+Defects caught by adversarial review and fixed before commit: {n} — {one-line list, or "none" if none}
 
-## 2. QA 커버리지 표 (sprints[].qaTable 통합)
+## 2. QA coverage table (consolidated from sprints[].qaTable)
 
-<!-- RULE: 출하된 기능/동작마다 1행. 체크 안 된 행에 사유 없으면 QA 게이트 FAIL이었어야 함. -->
+<!-- RULE: One row per shipped feature/behavior. An unchecked row with no stated reason means the QA gate should have FAILed. -->
 
-| Feature/behavior | 무엇으로 증명 | 상태 | 비고 |
+| Feature/behavior | Proof | Status | Notes |
 |---|---|---|---|
-| {…} | test runner `{name}` / manual probe / live check | ✅ checked | |
-| {…} | deferred-to-deploy | ⏸ deferred | {이유: 실키/실환경 필요 등} |
+| {…} | test runner `{name}` / manual probe / live check | checked | |
+| {…} | deferred-to-deploy | deferred | {reason: needs real key/real environment, etc.} |
 
-요약: checked {n} / deferred {n} / total {n}
+Summary: checked {n} / deferred {n} / total {n}
 
-## 3. Pending gates — 막혀 있는 것과 푸는 법
+## 3. Pending gates — what's blocked and how to unblock it
 
-| Gate | 내용 | 무엇이 풀어주나 |
+| Gate | Description | What unblocks it |
 |---|---|---|
-| 배포 | {마이그/워커/큐/재배포 목록} | 사용자 배포 승인 세션 |
-| 외부 의존 | {API 키 발급 등} | {…} |
-| 재색인 등 후속 | {…} | {…} |
+| Deploy | {list of migrations/workers/queues/redeploys} | User deploy approval session |
+| External dependency | {e.g. API key issuance} | {…} |
+| Follow-up (reindex, etc.) | {…} | {…} |
 
-## 4. 예상 질문 선제 답변
+## 4. Anticipated questions, answered up front
 
-<!-- RULE: "이 리포트를 읽은 사용자가 바로 물을 질문"을 3~5개 스스로 뽑아 답한다.
-     후보 채굴: QA 깊이("라이브로 검증됐나?"), 비용, 미배포 이유, 다음 순서, 리스크. -->
+<!-- RULE: Come up with 3-5 questions a reader would ask right after reading this report, and answer them.
+     Mining candidates: QA depth ("was this verified live?"), cost, why not deployed, next steps, risk. -->
 
-- **Q. {…}?** — {답}
-- **Q. {…}?** — {답}
+- **Q. {…}?** — {answer}
+- **Q. {…}?** — {answer}
 
-## 5. Carry items
+## 5. Deferred decisions — things postponed during execution instead of stopping
 
-| Item | 명시적 사유 | 다음 |
+<!-- RULE: Copy status.json deferredDecisions[] verbatim. A list of decisions that were ambiguous or
+     important but not irreversible, resolved with a reasonable default without stopping execution —
+     for the user to review and possibly reverse.
+     (Distinct from the irreversible-action gates above — those belong in §3 Pending gates.) -->
+
+| Decision | Default chosen | Reason (why deferred) | Reversible |
+|---|---|---|---|
+| {…} | {…} | {…} | {yes/hard} |
+
+(If none: "No deferred decisions.")
+
+## 6. Carry items
+
+| Item | Explicit reason | Next |
 |---|---|---|
 | {…} | {…} | {…} |
 
-## 6. 다음 액션 제안
+## 7. Suggested next actions
 
-1. {…} (권장 — {이유 한 줄})
+1. {…} (recommended — {one-line reason})
 2. {…}

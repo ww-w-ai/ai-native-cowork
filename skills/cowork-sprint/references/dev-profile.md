@@ -16,7 +16,7 @@
 - **Auto-detect (advisory)**: dev markers in repo root — `package.json`, `go.mod`,
   `Cargo.toml`, `pyproject.toml`, `pom.xml`, `build.gradle`, etc. Presence →
   *suggest* the dev profile at PHASE 0. Detection only suggests.
-- **Explicit**: the local config (`docs/CONVENTION.md` or `## cowork-sprint 범위`
+- **Explicit**: the local config (`docs/CONVENTION.md` or `## cowork-sprint scope`
   in `CLAUDE.md`/`AGENTS.md`) sets `profile: dev` (or `none`, or a future
   `marketing`/`research`).
 - **Override always wins.** The user/config decides; auto-detect never auto-applies

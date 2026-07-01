@@ -9,11 +9,25 @@
 
 A sprint = roughly **one human-week of work for a normal (non-AI) team** — the *unit of planning*, not of wall-clock. AI executes far faster, but sizing in human terms keeps scope legible and the roadmap honest.
 
+**HARD RULE — 1 sprint = ~1 human-week.** This is a **MANDATORY item at the plan gap-review** (§5 / SKILL.md MODEL SPLIT): every sprint is checked against the ~1-week unit — one clearly larger than ~1 week must be **SPLIT**, a trivially-small one **MERGED**, before execution. Never wave through a mis-sized roadmap; mis-sizing is a plan defect, not a nitpick.
+
 Heuristic:
-- Estimate the whole goal in human-effort terms.
-- **> ~1 human-week → split** into multiple sprints, each a coherent ~1-week slice that ends in something shippable/deliverable.
+- Estimate the whole goal in human-effort terms FIRST (≈ how many ~1-week deliverables it holds).
+- **Derive the sprint count from that estimate — never default to a fixed 3–6 regardless of size** (the common failure: the count collapses to 3–6 no matter the scope). State the derivation, e.g. "5 deliverables × ~1wk → 5 sprints". A count picked without an effort estimate is mis-scoping.
+- **Size-tier anchor** (a sanity band over the human-effort axis; 1 sprint ≈ 1 human-week):
+
+| Tier | Human-effort | Sprints |
+|---|---|---|
+| **Single** | ~1 week | **1** (one cohesive feature with no multi-area split → `/pdca-wf` is lighter) |
+| **Small** | ~2–4 weeks | **2–4** |
+| **Medium** | ~5–8 weeks (≈1–2 months) | **5–8** |
+| **Large** | ~9–12 weeks (≈2–3 months) | **9–12** |
+
+> Beyond ~12 sprints (> ~3 months / cross-team) → don't cram one status.json; **split into multiple roadmaps/initiatives** and run them as separate cowork-sprint efforts.
+
 - Each sprint must have a **clear deliverable + a QA/acceptance bar** (a sprint that can't be "done" is mis-scoped).
 - Prefer vertical slices (end-to-end value) over horizontal layers when possible.
+- **The count is provisional after the define step** (PHASE 0 step 3 = define each sprint = the PDCA *plan* role). During detailing (step 5 = per-sprint plan+design = the *design* role), **split an over-large sprint or merge trivially-small ones as the true size emerges — re-adjust the count and log the change + reason in status.json.** Re-adjusting during detailing is the DEFAULT, not an exception.
 
 ## 2. Dependency analysis & execution mode
 
@@ -205,18 +219,30 @@ Path: `.ww-w-ai/cowork-sprint/status.json`
       "at": "ISO8601"
     }
   ],
+  "deferredDecisions": [
+    {
+      "id": "dd-1",
+      "sprint": "sprint-1",
+      "cyclePhase": "design",
+      "question": "string — the ambiguous/important decision skipped mid-run",
+      "chosenDefault": "string — the reasonable default taken to keep moving (or 'skipped')",
+      "reason": "string — why deferred (ambiguous / important-not-irreversible), not decided",
+      "reversible": true
+    }
+  ],
   "startedAt": "ISO8601"
 }
 ```
 
 - `matchRate` — the **measured** value from gap-analysis (§5 QA Axis 2), not a target.
+- `deferredDecisions[]` — mid-run ambiguous/important decisions the Leader did NOT stop for (3-tier autonomy rule, SKILL.md PHASE 1): each records the default taken + why, surfaced as a batch in the final report for the user to review/override. Empty when the run had none. **This is the decision axis (defer + keep going); it is NOT the irreversible-safety gate (which still pauses mid-run).**
 - `gapItems[]` — `[{ id, status, note }]` (`status` ∈ done|partial|missing|divergent) from the last gap-analysis run; enables resume + report without recompute.
 - `prdRef` — path to the PRD-lite for this sprint (null when skipped per §6A knob #2).
 
 ## 6A. Local project config (generic default + override)
 
 cowork-sprint ships **generic defaults**. A repo MAY override them in a **local
-sprint config** — `docs/CONVENTION.md` **or** a `## cowork-sprint 범위`
+sprint config** — `docs/CONVENTION.md` **or** a `## cowork-sprint scope`
 (cowork-sprint scope) section in the repo's `CLAUDE.md`/`AGENTS.md`. The Leader
 reads it **at PHASE 0 every run**; if absent, the defaults below apply (and the
 Leader MAY note that project-specific knobs are undeclared). Declare only what

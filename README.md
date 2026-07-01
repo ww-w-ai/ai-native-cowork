@@ -148,6 +148,95 @@ The engine reads transcripts **from disk** — your conversation context is neve
 raw JSONL. Facets are cached in `~/.claude/recap-data/` and double as long-term history:
 trends survive even after the original session files are deleted.
 
+## Inside `/cowork-sprint`
+
+`/cowork-sprint` works like a real delivery team: **plan the whole roadmap first, then execute every sprint to the end autonomously** — pausing only for the few things it must not decide alone.
+
+### Mental model — one PDCA shape, nested three levels deep
+
+The same *plan → do → check → act* loop repeats at three grain sizes. Judgment lives at the top; mechanical execution is delegated downward.
+
+```mermaid
+flowchart TB
+  subgraph L1["LEVEL 1 · Initiative — cowork-sprint"]
+    A["Plan the WHOLE roadmap up front:<br/>size the work → split into sprints → you approve"] --> B["Run the sprints (in order or in parallel)"]
+  end
+  subgraph L2["LEVEL 2 · One Sprint = a PDCA cycle (~1 human-week)"]
+    R["research"] --> P["plan"] --> D["design"] --> DO["do"] --> Q["QA"] --> I["intent-audit"] --> SH["ship"]
+  end
+  subgraph L3["LEVEL 3 · One code feature = pdca-wf"]
+    W["Workflow engine:<br/>Do → Check → Report (drives to 100%)"]
+  end
+  B --> L2
+  DO -. "each code feature" .-> L3
+```
+
+- **Initiative** — splits the goal into sprints and runs them.
+- **Sprint** — each sprint is its own PDCA cycle, sized at ~1 human-week.
+- **Feature** — a code feature's build is delegated to `/pdca-wf`, a Workflow-driven PDCA. Non-code sprints (marketing, research, ops) skip this level and execute directly.
+
+### End-to-end flow
+
+```mermaid
+flowchart TD
+  Start(["/cowork-sprint &lt;goal&gt;"]) --> P0
+  subgraph P0["PHASE 0 · Plan everything first (freeze-before-code)"]
+    S1["Size the work<br/>1 sprint ≈ 1 human-week"] --> S2["Split into sprints<br/>Single 1 · Small 2-4 · Medium 5-8 · Large 9-12"]
+    S2 --> S3["Plan + design every sprint<br/>independent gap-review &amp; design-review"]
+  end
+  P0 --> G0{"Approval gate:<br/>you sign off the roadmap"}
+  G0 --> P1["PHASE 1 · Execute autonomously to the end"]
+  P1 --> G1{"Irreversible gate:<br/>deploy · push · migration · delete"}
+  G1 --> P2["PHASE 2 · Retrospective<br/>+ deferred-decisions batch"]
+  P2 --> Done(["done"])
+```
+
+Nothing is coded until the roadmap is planned **and approved**. After that it runs to completion — the only hard stop is an irreversible action.
+
+### One sprint's cycle — who does what
+
+```mermaid
+flowchart LR
+  research --> plan --> gapR["gap-review"] --> design --> desR["design-review"] --> do --> QA --> fix --> intent["intent-audit"] --> commit --> adv["adversarial review"] --> deploy
+  classDef main fill:#dbeafe,stroke:#2563eb,color:#1e3a8a;
+  classDef mech fill:#e5e7eb,stroke:#6b7280,color:#111827;
+  class research,plan,design,intent,adv main;
+  class do,QA,fix mech;
+```
+
+> **Blue** = the **main session** (Opus, thinking ON) — judgment: plan, design, adversarial review before anything irreversible.
+> **Gray** = delegated to **Sonnet subagents / Workflow** (thinking OFF) — mechanical: coding, QA, fixes.
+> `gap-review` / `design-review` are dispatched as **independent fresh-context reviewers** — their value is a second pair of eyes on the plan, not model depth (so a cheaper model suffices).
+
+### Sizing — 1 sprint = ~1 human-week (enforced)
+
+A sprint is **one human-week of work for a normal team** — the unit of planning, not wall-clock. The sprint count is *derived from the estimate*, never a lazy default:
+
+| Tier | Effort | Sprints |
+|---|---|---|
+| **Single** | ~1 week | 1 |
+| **Small** | ~2–4 weeks | 2–4 |
+| **Medium** | ~5–8 weeks | 5–8 |
+| **Large** | ~9–12 weeks | 9–12 |
+
+Beyond ~12 sprints, split into multiple roadmaps. Sizing is a **mandatory check at plan review** — an over-large sprint is split, a trivial one merged, *before* execution.
+
+### Autonomy — decide the obvious, defer the ambiguous
+
+While it runs (e.g. overnight), it never interrupts you for a *decision*:
+
+```mermaid
+flowchart TD
+  Q["A decision comes up mid-run"] --> T1{"Low-risk /<br/>easily reversible?"}
+  T1 -- yes --> DEC["Decide &amp; continue<br/>(logged)"]
+  T1 -- no --> T2{"One option<br/>obviously better?"}
+  T2 -- yes --> DEC
+  T2 -- no --> DEF["Take a sensible default,<br/>keep going,<br/>record to deferredDecisions[]"]
+  DEF --> BATCH["Present the whole batch<br/>at the END for your<br/>review / override"]
+```
+
+Ambiguous or important-but-reversible calls are made with a sensible default and **collected into a batch you review at the end** — never pinged mid-run. Clarifying questions are asked **once, up front**, at the approval gate. Only irreversible/outward actions pause for your explicit go.
+
 ## Architecture
 
 ```
