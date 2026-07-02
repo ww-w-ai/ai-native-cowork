@@ -18,3 +18,4 @@
 | 2026-06-05 23:57:28 | feat: /pdca-wf skill + cowork-sprint retrospective/execution-only integration (fully standalone) | [pdca-wf-skill-retrospective-standalone](./20260605-235728-pdca-wf-skill-retrospective-standalone.md) |
 | 2026-06-06 12:50:24 | feat: field-test-driven evolution — QA table gate, evolution-centric retro, output templates, stronger triggers | [field-test-driven-skill-evolution](./20260606-125024-field-test-driven-skill-evolution.md) |
 | 2026-06-29 06:27:51 | feat(cowork-sprint): absorb bkit dev strengths as a flexible dev profile (10 vendored agents + methodology + architecture lenses, no bkit dep) | [absorb-bkit-dev-profile](./20260629-062751-absorb-bkit-dev-profile.md) |
+| 2026-07-02 17:22:19 | docs(sync)+release: multi-axis QA doc alignment + bump to v1.15.0 | [release-v1-15-0-qa-doc-sync](./20260702-172219-release-v1-15-0-qa-doc-sync.md) |

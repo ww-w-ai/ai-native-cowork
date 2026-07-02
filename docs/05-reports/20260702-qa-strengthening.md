@@ -1,8 +1,9 @@
-> 상태: DONE (2026-07-02) — 적대적 리뷰로 재정리한 델타만 실행. 원계획의 ~2/3은
-> 이미 구현돼 있었고(dev-profile 흡수), 핵심 신규안(7축 하드코딩)은 사용자 교정으로
-> "환경 맞춤 사용 가이드(비옵션)"로 방향 전환. 대상: 이 플러그인(ai-native-cowork, MIT).
-> 원천: bkit(Apache-2.0). 이 파일이 정본 기록(DEV repo). 마켓플레이스 사본의 옛 버전은
-> 다음 publish 때 이걸로 갱신됨.
+> 상태: FROZEN report (2026-07-02) — 완료 기록(as-executed 스냅샷). 살아있는 진실은
+> `docs/01-built/dev-profile.design.md` + `skills/cowork-sprint/references/gap-analysis.md`
+> (multi-axis) + `agents/qa-debug-analyst.md`. 이 파일은 "무엇을·왜 그렇게" 남긴 기록일 뿐.
+> 적대적 리뷰로 재정리한 델타만 실행. 원계획의 ~2/3은 이미 구현돼 있었고(dev-profile 흡수),
+> 핵심 신규안(7축 하드코딩)은 사용자 교정으로 "환경 맞춤 사용 가이드(비옵션)"로 방향 전환.
+> 대상: 이 플러그인(ai-native-cowork, MIT). 원천: bkit(Apache-2.0).
 
 # cowork-sprint QA 강화 — as-executed 기록
 

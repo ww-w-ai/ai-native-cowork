@@ -68,9 +68,14 @@ Tiers are **suggested defaults** — any knob can be flipped regardless of tier.
     classify `partial`, not `done`).
   - 3-way contract agreement (spec ↔ server ↔ client on shape/params) when an API exists.
   - "evidence must be real depth, not a file that exists" (anti-gaming).
-  The matchRate method stays knob #4 (flat default; weighted opt-in). We do NOT
-  hardcode bkit's 6-axis weights — they're an *example* a repo may adopt via config.
-- Why flexible: the signals are portable wisdom; the exact weights are Kay's taste.
+  Multi-axis scoring (the 7 dimensions above) is the **dev-sprint default
+  discipline — NOT opt-in** (opt-in gets ignored); WHICH axes apply adapts to the
+  environment (drop UX with no UI, Runtime only when executable, redistribute —
+  never silently zero). What we do NOT hardcode is a *fixed weighted formula*: the
+  matchRate aggregation stays knob #4 (flat vs priority-weighted) and the axis SET
+  adapts per work. See `references/gap-analysis.md § Multi-axis scoring`.
+- Why flexible: the multi-axis discipline is portable wisdom (use it); the exact
+  fixed weights are Kay's taste (don't hardcode) — the two are separable.
 
 ### 3.3 Plan scheduler (from sprint-master-planner) — Tier S, generic
 - bkit: Kahn topological sort + greedy bin-packing by token budget; LOC×tokensPerLOC estimator.
