@@ -55,9 +55,14 @@ No separate presence gate; the anchor is just the PRD-lite step carried forward.
 Adds dev signals to the QA Axis-2 gap-analysis (references/gap-analysis.md § Dev
 lens): placeholder/stub detection (→ classify `partial`, not `done`), 3-way
 contract agreement (spec ↔ server ↔ client) when an API exists, "evidence must be
-real depth, not a file that exists" (anti-gaming). The matchRate method stays
-knob #4 (flat default; weighted opt-in). bkit's fixed 6-axis weights are an
-*example* a repo may adopt — not hardcoded.
+real depth, not a file that exists" (anti-gaming). On top of these signals, a dev
+sprint scores each item across the applicable **multi-axis reference** (Structural/
+Functional/Contract/Intent/Behavioral/UX/Runtime — gap-analysis.md § Multi-axis
+scoring): applying the multi-axis discipline is the dev default (NOT opt-in), while
+WHICH axes apply adapts to the environment (drop UX with no UI, Runtime only when a
+run is possible, redistribute — never silently zero). The matchRate aggregation
+method stays knob #4 (flat vs priority-weighted); the axis SET is adapted per work,
+never blindly hardcoded.
 
 ### 3.3 Plan scheduler (Tier S, generic)
 OFFERS (does not force) a deterministic scheduler in PHASE 0: given the feature
@@ -123,6 +128,9 @@ for them at the right moment ("you don't have to know — the right expert is di
 **Test (Tier A L1-L5) — dispatch in QA Axis-1 when tests are in scope:**
 - `qa-test-planner` → `qa-test-generator` — design → L1-L5 plan (JSON) → runnable tests
   (framework auto-detected), with graceful degradation.
+- `qa-debug-analyst` — when a runtime failure needs to be made observable: designs
+  structured logging + traces the failing path to a cited root cause. Runtime-agnostic
+  (no docker assumption); use the log surfaces the stack actually has.
 
 **Builders — dispatch by the work's domain (heavy tier mostly):**
 - `frontend-architect` (UI / components / design-system) · `infra-architect`

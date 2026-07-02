@@ -27,6 +27,9 @@ cowork's structure and philosophy.
 - `security-architect.md` — adapted from bkit `security-architect`
 - `qa-test-planner.md` — adapted from bkit `qa-test-planner`
 - `qa-test-generator.md` — adapted from bkit `qa-test-generator`
+- `qa-debug-analyst.md` — adapted from bkit `qa-debug-analyst`; the docker-log /
+  `zero-script-qa` skill assumption was removed and the log/trace mechanism
+  generalized to be runtime-agnostic (uses whatever log surfaces the stack exposes).
 - `frontend-architect.md` — adapted from bkit `frontend-architect`
 - `infra-architect.md` — adapted from bkit `infra-architect`
 - `enterprise-expert.md` — adapted from bkit `enterprise-expert`

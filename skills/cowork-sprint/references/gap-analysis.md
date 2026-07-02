@@ -73,8 +73,34 @@ score formula:
   web apps the hops UI→Client→API→Validation→DB→Response→UI are an *example*
   checklist, not fixed layers.
 
-bkit's fixed 6-axis weighted formula is an *example* a repo may adopt via config —
-not hardcoded here.
+### Multi-axis scoring (dev sprints — use it, adapt the axes)
+Flat `done/partial/missing` catches "is it there"; it under-counts *how well* each
+item holds up. For a **code/dev sprint, score each item across the dimensions that
+apply** — this discipline is the dev default, NOT an opt-in. (Scoring by a single
+number lets shallow work pass; the multi-axis view is what surfaces "built but
+hollow".) Adapt WHICH axes apply to your environment; do not drop the multi-axis
+discipline itself.
+
+Reference axis set (adapt to the work, don't hardcode blindly):
+- **Structural** — the scaffolding exists and is wired in (files/modules/routes present).
+- **Functional** — it actually performs the declared behavior, not a stub.
+- **Contract** — spec ↔ server ↔ client agree on shape/URL/params (when an interface exists).
+- **Intent** — it serves the PRD-lite intent (WHY/SUCCESS), not just the literal instruction.
+- **Behavioral** — edge cases, error paths, and states are handled.
+- **UX** — interaction/feedback correctness (frontend only).
+- **Runtime** — verified by actually executing it (only when a run is possible).
+
+Adaptation rule (environment-fit, NOT axis-skipping): an axis with no surface in
+THIS work redistributes its weight — it is not silently zero. Non-frontend → fold
+**UX** into Functional/Intent. No execution harness → **Runtime** is `not_measured`
+(§3.4 measure-then-advance), never faked green. A pure-logic lib may collapse to
+Structural + Functional + Behavioral + Intent. Record which axes you applied (and why
+an axis was dropped) in `gapItems[].note`.
+
+Every applied axis score MUST be backed by cited evidence (`file:function` or a run
+record). Target stays **100** (knob #3); a shortfall on any applied axis → `partial`
+/`divergent`, fed to the fix loop. Non-code sprints keep the flat item↔evidence
+compare — this multi-axis reference is a dev-sprint discipline, not a non-dev mandate.
 
 ## Local config
 matchRate threshold (#3), method flat/weighted (#4), lenses (#5), QA-axis
