@@ -1,6 +1,6 @@
 ---
 name: pdca-wf
-description: USE for ANY single-feature build request — the default engine whenever the user asks to implement, build, add, or rework ONE feature/capability end-to-end, even without naming this skill. Trigger on "이 기능 만들어줘/구현해줘/추가해줘", "build/implement/add this feature", "rework X", a feature spec or design doc handed over for implementation, or explicit "pdca", "pdca workflow", "verify to 100". Runs one PDCA cycle - Plan/Design in main (thinking), Research/Do/Check as deterministic native Workflow scripts, quality loop to 100 with no mid-run pauses (only irreversible actions gate back). Also invoked execution-only by cowork-sprint per feature. DO NOT use for - multi-feature initiatives sharing one scope/timeline (use cowork-sprint), trivial single-file edits or quick fixes under ~30min (just do them), pure questions/research with no build.
+description: USE for ANY single-feature build request — the default engine whenever the user asks to implement, build, add, or rework ONE feature/capability end-to-end, even without naming this skill. Trigger on "build/implement/add this feature", "rework X", a feature spec or design doc handed over for implementation, or explicit "pdca", "pdca workflow", "verify to 100". Runs one PDCA cycle - Plan/Design in main (thinking), Research/Do/Check as deterministic native Workflow scripts, quality loop to 100 with no mid-run pauses (only irreversible actions gate back). Also invoked execution-only by cowork-sprint per feature. DO NOT use for - multi-feature initiatives sharing one scope/timeline (use cowork-sprint), trivial single-file edits or quick fixes under ~30min (just do them), pure questions/research with no build.
 ---
 
 # pdca-wf — PDCA as a native Workflow execution engine
@@ -61,7 +61,7 @@ Create a TodoWrite todo per phase. Mark `in_progress` on entry, `completed` only
 - Write `02-planned/<dt>-<feature>-plan.md` (status ACTIVE-PLAN) — fill the Plan skeleton in `references/doc-templates.md` (fixed sections, fill slots).
 - Exit: plan file exists.
 
-### Phase 3 — Design (MAIN, thinking) — 박제
+### Phase 3 — Design (MAIN, thinking) — fixed artifact
 - Converge the design into `02-planned/<dt>-<feature>-design.md` (status ACTIVE-PLAN) — fill the Design skeleton in `references/doc-templates.md`. **This doc is the single input to Do.**
 - Produce a `WorkList` **as a JSON value** (schema in `references/schemas.md`) held in session AND embedded in the design doc for humans. Items: `{id, file, change, dependsOn}`.
 - **Main pre-processes the WorkList before Do**: topo-sort by `dependsOn`; build `fileGroups` (one array per file, dependency-ordered) so same-file items serialize and disjoint files parallelize.
@@ -148,7 +148,7 @@ All execution-phase scripts return schema-validated JSON. Full schemas: `referen
 | 0 Stamp | main | `<dt>`, scope check | single-feature only |
 | 1 Research | Workflow | `06-research/<dt>-<feature>.md` | — |
 | 2 Plan | main (thinking) | `02-planned/<dt>-<feature>-plan.md` | — |
-| 3 Design | main (thinking) | `02-planned/<dt>-<feature>-design.md` + WorkList | 박제 = Do input |
+| 3 Design | main (thinking) | `02-planned/<dt>-<feature>-design.md` + WorkList | fixed artifact = Do input |
 | 4 Do | Workflow | code | — |
 | 5 Check/Act | Workflow loop-to-100 | `05-reports/<dt2>-<feature>-check.md` | quality: no branch |
 | 6 Report | main | report + `01-built/<feature>.md` + cowork-doc-sync | safety: thinking review → irreversible gated |

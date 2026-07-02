@@ -19,7 +19,7 @@ Call at the **very end**, once implementation/refactoring/decisions are done. Al
 ## Required read (every call)
 
 - `references/taxonomy.md` — taxonomy + status + migration + tool separation + vault boundary + **§6 local-config contract** (single spec)
-- The target repo's **local doc-sync config** — `docs/CONVENTION.md` **or** a `## doc-sync 범위` section in the repo `CLAUDE.md`/`AGENTS.md`. Per-project must-not-miss (sync surfaces beyond docs/, status-claim verification commands, derived-doc builds) per taxonomy §6. If **absent**, offer to scaffold one from the §6 contract before scanning.
+- The target repo's **local doc-sync config** — `docs/CONVENTION.md` **or** a `## doc-sync scope` section in the repo `CLAUDE.md`/`AGENTS.md`. Per-project must-not-miss (sync surfaces beyond docs/, status-claim verification commands, derived-doc builds) per taxonomy §6. If **absent**, offer to scaffold one from the §6 contract before scanning.
 
 ## Determine scope (multi-session awareness — first)
 

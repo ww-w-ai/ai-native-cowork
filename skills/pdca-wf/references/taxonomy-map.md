@@ -15,9 +15,9 @@ Document outputs follow the cowork-doc-sync taxonomy. Status labels: LIVING / AC
 
 `<dt>` = `YYYY-MM-DD-HHmm`, stamped by MAIN via `date '+%Y-%m-%d-%H%M'` and injected through `args.dt`. Never generated inside a Workflow (sandbox `Date` throws). Datetime prefix gives sortable order + history.
 
-**Status labels apply only to LIVING/PLAN docs.** `02-planned/*` carry `> 상태: ACTIVE-PLAN`; `01-built/*` carry `> 상태: LIVING` + `> 최종 갱신: ...`. Dated snapshots (`05-reports/*`, `06-research/*`) carry **no status line** — the datetime filename IS the marker.
+**Status labels apply only to LIVING/PLAN docs.** `02-planned/*` carry `> Status: ACTIVE-PLAN`; `01-built/*` carry `> Status: LIVING` + `> Last updated: ...`. Dated snapshots (`05-reports/*`, `06-research/*`) carry **no status line** — the datetime filename IS the marker.
 
-**Re-stamp per writing re-entry.** Do NOT reuse the Phase-0 `<dt>` for everything: each main re-entry that writes a dated/last-updated artifact stamps a fresh `date`. Check snapshot uses `<dt2>` (Phase-5 time); Report + the `01-built` `최종 갱신` header use `<dt3>` (Phase-6 time). The `최종 갱신` header is `YYYY-MM-DD HH:MM` (space+colon) — reformat from the dashed `<dt>`.
+**Re-stamp per writing re-entry.** Do NOT reuse the Phase-0 `<dt>` for everything: each main re-entry that writes a dated/last-updated artifact stamps a fresh `date`. Check snapshot uses `<dt2>` (Phase-5 time); Report + the `01-built` `Last updated` header use `<dt3>` (Phase-6 time). The `Last updated` header is `YYYY-MM-DD HH:MM` (space+colon) — reformat from the dashed `<dt>`.
 
 ## Document lifecycle (on build completion)
 
@@ -48,7 +48,7 @@ Resume guard: design doc persists through Check; delete only in Phase 6 (termina
 | `02-planned` | **YES** — mark planned items that got built (cancellation marker). Noise cap: ≥50% struck AND struck ≥3 → delete the struck items, keep residual only (small-doc guard: <3 struck = keep) | keep file if residual, delete if all done |
 | `05-reports` / `06-research` | — | the dated files ARE the history |
 
-- 01-built header carries `> 최종 갱신: <YYYY-MM-DD HH:MM>` (stamped by main).
+- 01-built header carries `> Last updated: <YYYY-MM-DD HH:MM>` (stamped by main).
 - Strikethrough is a "planned→built" cancellation marker (narrow, inline) — NOT preservation of superseded text. Preservation-by-strikethrough is forbidden (delete instead; git is the history layer).
 - Re-pursuing a residual → fresh dated `02-planned` plan; never edit the old struck design in place.
 

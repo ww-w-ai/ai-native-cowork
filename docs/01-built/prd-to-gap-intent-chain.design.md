@@ -1,6 +1,6 @@
 # Design: PRD → WorkList → Gap-Analysis → Intent-Audit chain for cowork-sprint
 
-> 상태: BUILT (v1.13.0) — as-built. Live authority = `skills/cowork-sprint/references/{gap-analysis,dev-profile}.md` + `sprint-method.md` §6A. Design-of-record; for current behavior read the skill.
+> Status: BUILT (v1.13.0) — as-built. Live authority = `skills/cowork-sprint/references/{gap-analysis,dev-profile}.md` + `sprint-method.md` §6A. Design-of-record; for current behavior read the skill.
 > Scope: `skills/cowork-sprint` only. Domain-agnostic, lightweight, repo-local.
 > Provenance: approach adapted from **bkit** (`bkit:sprint` prd phase + `gap-detector` agent, Apache-2.0).
 > Only the *method/approach* is adapted — no proprietary text copied. See §8.
@@ -179,7 +179,7 @@ cowork-sprint's own status.json, touch nothing else.
 
 cowork-sprint ships **generic defaults**. Each repo MAY declare project-specific
 overrides in a **local sprint config** — either `docs/CONVENTION.md` **or** a
-`## cowork-sprint 범위` (cowork-sprint scope) section in the repo's
+`## cowork-sprint scope` section in the repo's
 `CLAUDE.md`/`AGENTS.md`. The skill reads it **at PHASE 0 every run**; if absent,
 it applies the defaults below (and MAY note that project-specific knobs are
 undeclared). Declare only what differs — omitted keys inherit the default.

@@ -11,7 +11,7 @@ description: |
 
   Triggers: AWS, Kubernetes, Terraform, infrastructure, CI/CD, cloud, deployment,
   IaC, container, orchestration, pipeline, EKS, RDS, VPC,
-  인프라, 쿠버네티스, 클라우드, 배포, インフラ, クラウド, 基础设施, 云架构,
+  infrastructure, Kubernetes, cloud, deployment, インフラ, クラウド, 基础设施, 云架构,
   infraestructura, nube, despliegue, infrastructure, déploiement,
   Infrastruktur, Bereitstellung, infrastruttura, distribuzione
 

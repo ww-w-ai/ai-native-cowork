@@ -31,7 +31,7 @@ Parse the user's request to determine these flags:
 **Language detection (do this, don't default blindly):** look at the language the user is actually
 writing in *this* conversation and pass it as `--language`. Korean prompts → `ko`, English → `en`,
 Japanese → `ja`. Only override when the user explicitly asks for a specific output language
-("리포트는 영어로" → `en`). Use the SAME language for the facet step (Step 1.5) and the report so the
+("write the report in English" → `en`). Use the SAME language for the facet step (Step 1.5) and the report so the
 two layers match.
 
 ## Step 1.5: Generate the qualitative layer (facets) — BEFORE rendering

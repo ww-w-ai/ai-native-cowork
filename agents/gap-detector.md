@@ -12,8 +12,8 @@ description: |
   implementation comparison, or after a feature implementation lands.
 
   Triggers: gap analysis, matchRate, design vs implementation, verify completeness,
-  compare design, did we build everything, 갭 분석, 설계-구현 비교, 검증, 다 만들었어?,
-  설계대로야?, ギャップ分析, 設計検証, 差距分析, 对比设计, está correcto, c'est complet.
+  compare design, did we build everything, gap analysis, design-vs-build comparison, verify,
+  did we build it all?, does it match the design?, ギャップ分析, 設計検証, 差距分析, 对比设计, está correcto, c'est complet.
 
   Used under cowork-sprint profile:dev (the QA gate's Axis 2). Do NOT use for
   documentation-only tasks, initial planning, or design creation.

@@ -1,5 +1,5 @@
-> 상태: LIVING — as-built. Live authority = `../../SKILL.md` + `../../references/*`. This is the consolidated as-built summary (supersedes the 02-planned design docs).
-> 최종 갱신: 2026-06-06 13:05
+> Status: LIVING — as-built. Live authority = `../../SKILL.md` + `../../references/*`. This is the consolidated as-built summary (supersedes the 02-planned design docs).
+> Last updated: 2026-06-06 13:05
 
 # pdca-wf — as-built
 
@@ -21,7 +21,7 @@ Single-feature PDCA cycle with native Workflow as the execution engine. Lives in
 - **DONE predicate** (code-checkable: all WorkList items present + no blocker/major gaps) gates the irreversible design-doc delete — not the raw LLM float.
 - **Agent lifecycle**: discover/reuse via `agentType`; create/evolve in main (sandbox can't write files).
 - **Entry modes (Phase 0)**: interactive (no design doc → Phases 1-3 dialogue) vs **execution-only** (design doc with WorkList supplied — by user or cowork-sprint PHASE 1 — validate then jump to Phase 4; planning is never re-entered mid-autonomous-run).
-- **Trigger surface**: fires on implicit single-feature build requests ("이 기능 만들어줘", "implement X") — not only explicit skill-name mentions. NOT for multi-feature (cowork-sprint), <~30min trivial edits, pure Q&A.
+- **Trigger surface**: fires on implicit single-feature build requests ("build me this feature", "implement X") — not only explicit skill-name mentions. NOT for multi-feature (cowork-sprint), <~30min trivial edits, pure Q&A.
 - **standalone — no external plugin dependency.**
 
 ## Quality history

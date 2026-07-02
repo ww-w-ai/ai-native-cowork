@@ -15,7 +15,7 @@ description: |
   frontend/UI work under profile:dev.
 
   Triggers: frontend, UI architecture, component, React, Next.js, design system,
-  프론트엔드, UI 아키텍처, 컴포넌트, 디자인 시스템, 리액트,
+  frontend, UI architecture, component, design system, React,
   フロントエンド, UIアーキテクチャ, コンポーネント, デザインシステム,
   前端架构, UI架构, 组件, 设计系统,
   frontend, arquitectura UI, componente, sistema de diseño,

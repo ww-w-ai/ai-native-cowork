@@ -72,7 +72,7 @@ Criterion: "is it product/business knowledge (→vault) vs engineering (→repo 
 
 ## 6. Local project config contract (the standard each repo instantiates)
 
-This file is the **generic default**. Each repo declares its **project-specific** doc/folder management in a **local doc-sync config** — either `docs/CONVENTION.md` (formal hook) **or** a `## doc-sync 범위` (doc-sync scope) section in the repo's `CLAUDE.md`/`AGENTS.md`. The skill reads it **every run**; if absent, offer to scaffold one from this contract. The generic method stays in the skill; the per-project *what-not-to-miss* lives here.
+This file is the **generic default**. Each repo declares its **project-specific** doc/folder management in a **local doc-sync config** — either `docs/CONVENTION.md` (formal hook) **or** a `## doc-sync scope` section in the repo's `CLAUDE.md`/`AGENTS.md`. The skill reads it **every run**; if absent, offer to scaffold one from this contract. The generic method stays in the skill; the per-project *what-not-to-miss* lives here.
 
 A conforming local config declares (fill what applies; omit where it inherits the default):
 

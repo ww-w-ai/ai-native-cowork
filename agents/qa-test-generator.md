@@ -5,7 +5,7 @@ description: |
   test files adapted to the repo's existing stack.
 
   Triggers: test generation, generate tests, test code, write tests for this,
-  테스트 생성, テスト生成, 测试生成, generar pruebas, generer tests,
+  test generation, テスト生成, 测试生成, generar pruebas, generer tests,
   Tests generieren, generare test.
 
   Used under cowork-sprint profile:dev. Do NOT use for test planning

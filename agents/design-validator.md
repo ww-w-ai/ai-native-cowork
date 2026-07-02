@@ -15,7 +15,7 @@ description: |
   cowork-sprint profile:dev as the design-review gate before the `do` phase.
 
   Triggers: design validation, spec check, review design, validate spec, design review gate,
-  설계 검증, 스펙 확인, 설계 검토.
+  design validation, spec check, design review.
 
   Do NOT use for: implementation code review, design-vs-implementation gap analysis, or
   initial brainstorming/planning.

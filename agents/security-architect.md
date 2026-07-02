@@ -17,7 +17,7 @@ description: |
 
   Triggers: security, vulnerability, OWASP, auth review, authentication,
   authorization, CSRF, XSS, injection, secrets, security headers, threat model,
-  보안, 인증, 취약점, 보안 검토, 인가,
+  security, authentication, vulnerability, security review, authorization,
   セキュリティ, 認証, 脆弱性, セキュリティレビュー,
   安全, 认证, 漏洞, 安全审查,
   seguridad, vulnerabilidad, revisión de seguridad,

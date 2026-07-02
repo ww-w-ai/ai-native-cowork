@@ -93,7 +93,7 @@ verbatim (the prompt wording is the reusable know-how). Classify every turn:
   constraint was chosen or removed, and assumptions a successor must not silently violate. If a
   successor could pick up the work cleanly without a turn, it is droppable trivia.
 - **DROP the trivia** (whole turn): exploratory chatter, tool-call notifications / status pings,
-  transient back-and-forth, acknowledgments **in any language** ("ok" / "go" / "진행" / "はい" / …),
+  transient back-and-forth, acknowledgments **in any language** ("ok" / "go" / "proceed" / "はい" / …),
   "focus on X" redirections, and **mid-way reversals
   that were later superseded** (keep only the conclusion that won, not the abandoned detours).
   The Recap narrates the flow; the log keeps only the substantive, still-standing decisions.

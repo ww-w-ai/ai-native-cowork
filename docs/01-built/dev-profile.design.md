@@ -1,6 +1,6 @@
 # Design: cowork-sprint "dev profile" — absorbing bkit's dev strengths, flexibly
 
-> 상태: BUILT (v1.13.0) — as-built design. Live authority = `skills/cowork-sprint/references/dev-profile.md` (+ vendored `agents/`). Design-of-record; for current behavior read the skill.
+> Status: BUILT (v1.13.0) — as-built design. Live authority = `skills/cowork-sprint/references/dev-profile.md` (+ vendored `agents/`). Design-of-record; for current behavior read the skill.
 > Builds on: [prd-to-gap-intent-chain.design.md](./prd-to-gap-intent-chain.design.md) (the §6A local-config + gap-analysis chain this extends).
 > Provenance: mechanisms adapted from **bkit** (Apache-2.0, popup-studio-ai/bkit-claude-code).
 > Method/ideas only — no source text copied. Attribution in each absorbed reference file.
@@ -31,7 +31,7 @@ The dev profile is one named preset in the §6A local-config system.
 
 - **Auto-detect** (advisory): dev markers in repo root — `package.json`, `go.mod`,
   `Cargo.toml`, `pyproject.toml`, `pom.xml`, etc. Presence → suggest dev profile.
-- **Explicit**: `## cowork-sprint 범위` / `docs/CONVENTION.md` declares
+- **Explicit**: `## cowork-sprint scope` / `docs/CONVENTION.md` declares
   `profile: dev` (or `none`, or a future `marketing`/`research`).
 - **Override always wins.** Auto-detect only *suggests*; the user/config decides.
 - Non-dev sprints are untouched — the generic defaults (prd-to-gap design) apply.

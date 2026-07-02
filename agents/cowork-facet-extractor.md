@@ -46,13 +46,13 @@ If any input is missing, state precisely what you need and stop — do not guess
 
 ## Analysis guidelines (from Claude Code's own /insights spec)
 
-1. **goalCategories** — count ONLY what the USER explicitly asked for ("can you…", "please…",
-   "I need…", "let's…", "해줘", "하자"). Do NOT count Claude's autonomous codebase exploration or
+1. **goalCategories** — count ONLY what the USER explicitly asked for, in any language ("can you…",
+   "please…", "I need…", "let's…", "do this for me", "let's do X"). Do NOT count Claude's autonomous codebase exploration or
    self-initiated work. Keys are short category slugs; values are counts. Use `warmup_minimal` for a
    trivial/warmup session.
-2. **satisfaction** — base ONLY on explicit user signals: "perfect!/완벽"→`happy`; "thanks/looks
-   good/좋아"→`satisfied`; "ok now let's…/그럼 이제"→`likely_satisfied`; "that's not right/별론데/
-   아닌데"→`dissatisfied`; "this is broken/망했/그만"→`frustrated`. No signal → `likely_satisfied`.
+2. **satisfaction** — base ONLY on explicit user signals (in any language): "perfect!"→`happy`; "thanks/looks
+   good"→`satisfied`; "ok now let's…"→`likely_satisfied`; "that's not
+   right"→`dissatisfied`; "this is broken/stop"→`frustrated`. No signal → `likely_satisfied`.
 3. **frictionTypes** — be specific. Prefer these slugs when they fit: `misunderstood_request`,
    `wrong_approach`, `buggy_code`, `repeated-bugs`, `scope_creep`, `trust_gap`, `trust-erosion`,
    `context_length`, `context_loss`, `incomplete_work`, `destructive-action`, `looping_on_errors`,

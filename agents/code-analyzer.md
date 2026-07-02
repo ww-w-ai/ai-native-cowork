@@ -11,7 +11,7 @@ description: |
 
   Triggers: code analysis, quality check, security scan, code review, architecture check,
   any issues?, any problems?, something off?, analyze before PR,
-  코드 분석, 품질 검사, 보안 스캔, 뭔가 이상해, 괜찮아 보여?, 품질,
+  code analysis, quality check, security scan, something seems off, does this look ok?, quality,
   コード分析, 品質チェック, おかしい, 問題,
   代码分析, 质量检查, 有问题?, 质量,
   hay problemas?, algo mal?, il y a des problèmes?, gibt es Probleme?, ci sono problemi?
