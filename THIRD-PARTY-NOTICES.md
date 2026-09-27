@@ -7,8 +7,8 @@ open-source projects. Their licenses and attributions are listed below.
 
 ## bkit (bkit-claude-code)
 
-- **Source**: https://github.com/popup-studio-ai/bkit-claude-code
-- **Author**: POPUP STUDIO PTE. LTD.
+- **Source**: https://github.com/ww-w-ai/bkit-claude-code
+- **Author**: DubDubDub Corp.
 - **License**: Apache License 2.0 (permissive)
 
 ### What was adapted
