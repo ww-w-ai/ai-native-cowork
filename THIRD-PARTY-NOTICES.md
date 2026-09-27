@@ -52,7 +52,7 @@ of copyright and license notices — this file and the per-file headers satisfy 
 ### Apache License 2.0 — notice
 
 ```
-Copyright POPUP STUDIO PTE. LTD.
+Copyright DubDubDub Corp.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
